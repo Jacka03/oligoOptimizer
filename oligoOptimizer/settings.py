@@ -37,13 +37,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'analysis.apps.AnalysisConfig',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -53,11 +54,27 @@ ROOT_URLCONF = 'oligoOptimizer.urls'
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        # 'BACKEND': 'django.template.backends.django.DjangoTemplates',  # default
+        'BACKEND': 'django.template.backends.jinja2.Jinja2',  # jinja2
+        'DIRS': [Path(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
+            'environment': 'oligoOptimizer.jinja2_env.Environment',  # default
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',  # default
+        # 'BACKEND': 'django.template.backends.jinja2.Jinja2',  # jinja2
+        'DIRS': [Path(BASE_DIR, 'templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            # 'environment': 'jinja2_env.Environment',  # default
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -76,8 +93,16 @@ WSGI_APPLICATION = 'oligoOptimizer.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': 'rm-bp14u7355cr17d2fv2o.mysql.rds.aliyuncs.com',
+        'PORT': 3306,
+        'USER': 'biocomputing',
+        'PASSWORD': '6IWq7rd3@J',
+        'NAME': 'biocomputing',
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            'charset': 'utf8mb4'
+        }
     }
 }
 
@@ -110,15 +135,22 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_L10N = True
+USE_L10N = False
+DATETIME_FORMAT = 'Y-m-d H:i:s'
 
 USE_TZ = True
+DATE_FORMAT = 'Y-m-d'
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    #
+    Path(BASE_DIR, 'static'),
+]
+# STATIC_ROOT = '/data/oligoOptimizer/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

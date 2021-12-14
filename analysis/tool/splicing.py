@@ -13,6 +13,15 @@ def show_w(x, y, head):
     plt.show()
 
 
+def cal_interval(list):
+    res = []
+    for i in range(1, len(list)):
+        res.append(list[i] - list[i-1])
+    print(res)
+    print("min:{0}, max:{1}".format(min(res), max(res)))
+    return res
+
+
 class Splicing:
 
     def __init__(self, input_info):
@@ -218,9 +227,88 @@ class Splicing:
         show_w(index_res, tm_res, "greedy")
         return index_res, tm_res
 
+    def cal_all_tm(self, arr):
+        """
+        求这种切割位点的tm的标准差
+        :param arr: 整个基因片段的切割位点
+        :return: np.std(tm_list)：标准差， tm_list：每段的tm组成的list
+        """
+        tm_list = []
+        arr = arr.astype(int)
+        for i in range(1, len(arr)):
+            tm_t = self.cal_tm(self.gene[arr[i - 1]: arr[i]])
+            tm_list.append(tm_t)
+        return np.std(tm_list), tm_list
+
+    def iteration(self, index_list, tm_list):  # 全局迭代，从左到右
+        """
+        全局迭代，
+        :param index_list:上次得到最好的剪切位置
+        :param tm_list:每个剪切片段的tm
+        :return:
+        """
+        flag = [-1, -2, -3]  # 提前停止遍历的终止判断
+        tem_max_len = self.max_len + 5
+        tem_min_len = self.min_len - 5
+        bias_len = 5
+        while flag[-1] != flag[-3]:
+            for i in range(len(tm_list)):  # 对于整条
+                left = index_list[i]
+                right = index_list[i + 1]
+                # 遍历
+                tem_result = []
+                for j in range(1 - bias_len, bias_len):  # 对于每个片段,
+                    tem_left = left + j  # 左边新的切割位点
+                    if tem_left < 0:
+                        # 当第一个位点小于0时，舍弃该情况
+                        continue
+                    # 左边移动后前一个片段的长度判断：
+                    if i >= 1 and (
+                            tem_left - index_list[i - 1] < tem_min_len or tem_left - index_list[i - 1] > tem_max_len):
+                        # 当左边位点移动导致左边片段过长或者过短时，舍弃该情况
+                        continue
+
+                    for k in range(1 - bias_len, bias_len):
+                        tem_right = right + k  # 右边新的切割位点
+                        if tem_right >= self.gene_len:
+                            # 右边切割位点超越右边界
+                            continue
+                        # 右节点移动后下一个片段长度判断
+                        if i + 1 < len(tm_list) and (
+                                index_list[i + 2] - tem_right > tem_max_len or index_list[
+                            i + 2] - tem_right < tem_min_len):
+                            # 当右边位点移动导致右边片段过长或者过短时，舍弃该情况
+                            continue
+                        # 当前片段长度是否正确
+                        if tem_min_len > (tem_right - tem_left) or (tem_right - tem_left) > tem_max_len:
+                            # 当前片段过长或者过短时
+                            continue
+
+                        tem_index_list = index_list.copy()
+                        tem_index_list[i] = tem_left
+                        tem_index_list[i + 1] = tem_right
+                        tem_std, _ = self.cal_all_tm(tem_index_list)
+                        tem_result.append([tem_left, tem_right, tem_std])
+
+                tem_result = self.choose(tem_result, count=1)
+                index_list[i] = tem_result[0, 0]
+                index_list[i + 1] = tem_result[0, 1]
+                best_std, tm_list = self.cal_all_tm(index_list)  # 本次迭代得到最好的std和tm_list
+
+            flag.append(best_std)
+            show_w(index_list[1:], tm_list, "d")
+        show_w(index_list[1:], tm_list, "iteration")
+
+        return index_list, tm_list
+
     def cal(self):
         index, tm = self.cal_next_tm()
-        index1, tm1 = self.cal_next_tm(np.mean(tm))
+        index, tm = self.cal_next_tm(np.mean(tm))
+        cal_interval(index)
+        index = np.insert(index, 0, [0])
+        cal_interval(index)
+        index, tm = self.iteration(index, tm)
+        cal_interval(index)
 
 
 if __name__ == '__main__':

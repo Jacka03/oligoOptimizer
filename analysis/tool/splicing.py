@@ -27,6 +27,7 @@ class Splicing:
     def __init__(self, input_info):
         self.input_info = input_info  # 各种离子信息
         self.gene = input_info['gene'].upper()  # 基因序列
+        self.gene_len_sor = input_info['geneLen']  # 基因序列
         self.gene_len = input_info['geneLen']  # 基因序列
         self.res_type = input_info['resultType']  # 结果类型
         self.result = input_info['result']
@@ -290,7 +291,7 @@ class Splicing:
                         tem_std, _ = self.cal_all_tm(tem_index_list)
                         tem_result.append([tem_left, tem_right, tem_std])
 
-                print(tem_result)
+                # print(tem_result)
                 tem_result = self.choose(tem_result, count=1)
                 index_list[i] = tem_result[0, 0]
                 index_list[i + 1] = tem_result[0, 1]
@@ -408,14 +409,129 @@ class Splicing:
         tem_index.append(tem_res[0][0])
         tem_tm.append(tem_res[0][1])
 
-        # print(tem_index)
-        # print(tem_tm)
         self.gene = tem_gene
         self.gene_len = len(self.gene)
         self.tail = True
-
+        # print('tail')
         return tem_index, tem_tm
 
+    def get_gene_list(self, index_list):
+        # 将两个overlap拼接成一个Oligo
+        dnaTable = {
+            "A": "T", "T": "A", "C": "G", "G": "C"
+        }
+        gene_complement = ""  # DNA互补链
+        for ele in self.gene:
+            gene_complement += dnaTable[ele]
+
+        res_index1 = []  # 存储DNA双链上面的oligo
+        for i in range(0, len(index_list), 2):
+            if i + 1 < len(index_list):
+                res_index1.append(self.gene[int(index_list[i][1]): int(index_list[i + 1][2])])
+        if len(index_list) % 2 != 0:  # 最后一片
+            res_index1.append(self.gene[int(index_list[-1][1]): int(index_list[-1][2])])
+
+        res_index2 = []  # 存储DNA双链下面的oligo
+        # 第一片
+        gene_tem = gene_complement[int(index_list[0][1]):int(index_list[0][2])]  # TODO 第一篇出问题了
+        res_index2.append(gene_tem[::-1])
+        for i in range(1, len(index_list), 2):
+            if i + 1 < len(index_list):
+                gene_tem = gene_complement[int(index_list[i][1]):int(index_list[i + 1][2])]
+                res_index2.append(gene_tem[::-1])  # 转化成5'到3'
+        if len(index_list) % 2 == 0:  # 最后一片
+            gene_tem = gene_complement[int(index_list[-1][1]):int(index_list[-1][2])]
+            res_index2.append(gene_tem[::-1])
+
+        return res_index1, res_index2
+
+    def get_more_info(self, list_g1, list_g2, cut_of_index):
+        # 获取返回前端的信息
+        info = []  # 存放oligo信息[index, oligo, len, overlap, tm]
+        for i, tem_gene in enumerate(list_g1):  # 先计算上面的单链
+            ind = 'F{0}'.format(i)
+            if i * 2 + 1 >= len(cut_of_index):
+                # continue
+                overlap = -1
+                tem_tm = -1
+            else:
+                overlap = int(cut_of_index[i * 2 + 1][2] - cut_of_index[i * 2 + 1][1])
+                tem_tm = round(self.cal_tm(tem_gene[-overlap:]), 2)
+            # index， gene， len_gene， gene_tm， overlap
+            info.append([ind, tem_gene, tem_tm, overlap, len(tem_gene)])
+
+        x1 = len(info)
+        # if info[-1][2] == -1:
+        #     del(info[-1])
+        # pass
+
+        for i, tem_gene in enumerate(list_g2):  # 计算下面的单链
+            ind = 'R{0}'.format(i)
+            if i * 2 >= len(cut_of_index) or i == 0:
+                # continue
+                overlap = -1
+                tem_tm = -1
+            else:
+                overlap = int(cut_of_index[i * 2][2] - cut_of_index[i * 2][1])
+                tem_tm = round(self.cal_tm(tem_gene[:overlap]), 2)
+            info.append([ind, tem_gene, tem_tm, overlap, len(tem_gene)])  # , Splicing.cal_tm(tem_gene)
+
+        x2 = len(info) - x1
+        count_cut = len(cut_of_index)
+
+        # out = []  # 这两条连的是不需要计算tm的
+        if count_cut % 2 == 0:
+            out = [count_cut / 2, count_cut]
+        else:
+            out = [int(math.floor(count_cut / 2)), int(math.floor(count_cut / 2)) + 1]
+
+        data = []  # 记录overlap片段的tm
+        for i, ele in enumerate(info):
+            if i not in out:
+                data.append(ele[2])
+
+        len_g1 = len(list_g1)
+        len_g2 = len(list_g2)
+        len_info = len(info)
+        result = []
+        print(len_g1, len_g2, x1, x2)
+        for i in range(max(len_g1, len_g2)):
+            if i < len_g1 - 1:
+                result.append(info[i])
+            if len_g1 + i + 1 < len_info:
+                tem = info[len_g1 + i + 1]
+                tem[0] = "R{0}".format(i)
+                result.append(tem)
+
+        # [ind, tem_gene, tem_tm, overlap, len(tem_gene)]
+        # 第一段 可以写死
+        len1 = info[0][4] - info[0][3]
+        f_gene = info[0][1][:len1]
+        result.append(["F_Primer", f_gene, round(self.cal_tm(f_gene), 2), '', len1])
+
+        # len1 = info[-1][2] - info[-1][4]
+        if len_g1 != len_g2:
+            result.append(["R_Primer", info[-1][1], round(self.cal_tm(info[-1][1]), 2), '', len(info[-1][1])])
+        else:
+            len1 = info[-1][3]
+            f_gene = info[-1][1]
+            result.append(["R_Primer", f_gene[:len1], round(self.cal_tm(f_gene[:len1]), 2), '', info[-1][3]])
+
+        # overlap的信息
+        overlap_data = {
+            'min': min(data),
+            'max': max(data),
+            'range': round(max(data) - min(data), 2),
+            'mean': round(np.mean(data), 2),
+            'std': round(np.std(data), 2),
+            'result': result
+        }
+        if self.tail:
+            # print('tail', self.gene_len, cut_of_index[-1][2])
+            overlap_data['tail'] = self.gene[self.gene_len_sor: cut_of_index[-1][2]]
+            # print(overlap_data['tail'])
+
+        return overlap_data
 
     def cal(self):
         index, tm = self.cal_next_tm()
@@ -431,7 +547,14 @@ class Splicing:
         index, tm = self.iteration(index, tm)
         cal_interval(index)
 
-        self.overlap(index, tm)
+        cut_of_index = self.overlap(index, tm)
+        res1, res2 = self.get_gene_list(cut_of_index)
+
+        info = self.get_more_info(res1, res2, cut_of_index)
+
+        next_cal = [res1, res2, len(cut_of_index)]
+        print(next_cal)
+        return next_cal, info
 
 
 if __name__ == '__main__':

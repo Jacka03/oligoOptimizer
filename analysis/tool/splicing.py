@@ -290,6 +290,7 @@ class Splicing:
                         tem_std, _ = self.cal_all_tm(tem_index_list)
                         tem_result.append([tem_left, tem_right, tem_std])
 
+                print(tem_result)
                 tem_result = self.choose(tem_result, count=1)
                 index_list[i] = tem_result[0, 0]
                 index_list[i + 1] = tem_result[0, 1]
@@ -388,11 +389,43 @@ class Splicing:
         # print()
         return gene_list
 
+    def input_tail(self, tem_index, tem_tm):
+        tem_index = tem_index.tolist()
+        tem_tm = tem_tm.tolist()
+        str = "CAGTTCCTGAAGATAGATTAAGGCACCGTGATGAACGTATGCACAGCTT"
+        tem_gene = self.gene + str
+
+        tem_ans = []
+        for i in range(self.segment_len):
+            end_cut = int(tem_index[-1] + self.min_len + i)
+            end_tm = self.cal_tm(tem_gene[int(tem_index[-1]): end_cut])
+            # cal
+            tm_list = tem_tm + [end_tm]
+            end_std = np.std(tm_list)
+            tem_ans.append([end_cut, end_tm, end_std])
+
+        tem_res = self.choose(tem_ans, 1)
+        tem_index.append(tem_res[0][0])
+        tem_tm.append(tem_res[0][1])
+
+        # print(tem_index)
+        # print(tem_tm)
+        self.gene = tem_gene
+        self.gene_len = len(self.gene)
+        self.tail = True
+
+        return tem_index, tem_tm
+
+
     def cal(self):
         index, tm = self.cal_next_tm()
         cal_interval(index)
         index, tm = self.cal_next_tm(np.mean(tm))
         cal_interval(index)
+
+        if len(index) % 2 == 0:  # add tail
+            index, tm = self.input_tail(index, tm)
+
         index = np.insert(index, 0, [0])
         cal_interval(index)
         index, tm = self.iteration(index, tm)

@@ -1,0 +1,81 @@
+html, body, #app {
+    margin: 0;
+    height: 100%;
+}
+
+.el-main {
+    background-color: #E9EEF3;
+    color: #333;
+    /*height: 100% !important;*/
+    min-height: 640px;
+}
+.el-menu.el-menu--horizontal {
+    border-bottom: 0px;
+}
+
+
+/*--------------------------------*/
+
+.font-style {
+    font-size: 52px;
+    text-align: center;
+    line-height: 76px;
+    vertical-align: middle;
+}
+
+.head-style {
+    background: #9de78a;
+    height: 76px !important;
+    /*border-radius: 4px;*/
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+
+/*------------------------------*/
+
+.menu-item {
+    height: 30px !important;
+    line-height: 30px !important;
+}
+
+.main-height {
+    min-height: 600px;
+    background-color: #8c939d;
+}
+
+.main-style {
+    background-color: #d0d0d0;
+    width: 100%;
+    /*min-height: 570px;*/
+}
+
+/*------------------------*/
+
+.footer-font {
+    font-size: 15px;
+    text-align: center;
+    line-height: 30px;
+    vertical-align: middle
+}
+
+.footer-style {
+    background: #a3a8a1;
+    height: 30px !important;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.el-tabs__nav-wrap {
+    height: 30px;
+    line-height: 30px;
+}
+
+.el-tabs__nav-scroll {
+    height: 30px;
+    line-height: 30px;
+}
+
+.el-tabs__item {
+    height: 30px;
+    line-height: 30px;
+}

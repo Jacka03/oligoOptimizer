@@ -1,0 +1,1248 @@
+<!DOCTYPE html  xmlns="http://www.w3.org/1999/xhtml">
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>home</title>
+    <link rel="stylesheet" href="../static/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="../static/css/main.css">
+    <link rel="stylesheet" href="../static/css/assembly.css">
+
+</head>
+<body>
+<div id="app" style="width: 1024px; margin: auto;">
+    <el-container>
+        <el-main>
+            <div class="head-style font-style">
+                OligoOptimizer
+            </div>
+
+            <div class="menu-style">
+                <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal"
+                         background-color="#545c64"
+                         text-color="#fff"
+                         active-text-color="#ffd04b">
+
+                    <el-menu-item index="first" class="menu-item">
+                        <a href="#" target="_self">introduction</a>
+                    </el-menu-item>
+
+                    <el-menu-item index="second" class="menu-item">
+                        <a href="#" target="_self">home</a>
+                    </el-menu-item>
+
+                    <el-menu-item index="third" class="menu-item">
+                        <a href="#" target="_self">doc</a>
+                    </el-menu-item>
+
+                </el-menu>
+            </div>
+
+            <el-container>
+                <div id="show" class="main-height main-style"
+                     style="background-color: #eeeeee;">
+
+                    <el-tabs type="border-card" style="border: 0"
+                             v-model="activeName"
+                             ref="tabs">
+
+                        <el-tab-pane label="input" name="input" v-loading="loading">
+
+                            <el-form :model="dynamicValidateForm" ref="dynamicValidateForm" label-width="120px">
+                                <div style="text-align:right;">
+                                    <el-button
+                                            size="mini"
+                                            @click="testDemo()"
+                                            type="primary">
+                                        demo
+                                    </el-button>
+                                </div>
+
+                                <h3 style="margin-top: 0px;">Email Address</h3>
+                                <el-form-item
+                                        size="small"
+                                        prop="email"
+                                        label="email"
+                                        :rules="[{ required: true, message: 'Please enter email address', trigger: 'blur' },
+                                                 { type: 'email', message: 'Please enter the correct email address', trigger: 'blur,change' }]"
+                                >
+                                    <el-input
+                                            size="small"
+                                            clearable
+                                            v-model="dynamicValidateForm.email"
+                                            class="input_style"></el-input>
+                                    Required.
+
+                                </el-form-item>
+
+                                <h3>Gene Information</h3>
+                                <el-form-item
+                                        size="small"
+                                        label="name">
+                                    <el-input class="input_style"
+                                              size="small"
+                                              clearable
+                                              placement="top"
+                                              v-model="dynamicValidateForm.geneName"
+                                    ></el-input>
+                                    Optional.
+                                </el-form-item>
+
+                                <el-form-item label="description Optional">
+                                    <el-input
+                                            clearable
+                                            type="textarea" rows="4"
+                                            v-model="dynamicValidateForm.geneDesc"
+                                    >
+                                    </el-input>
+                                </el-form-item>
+
+
+                                <el-form-item prop="gene" style="margin-bottom: 5px !important;" label="DNA seq"
+                                              required>
+                                    <el-input type="textarea" rows="7"
+                                              @input="calGeneLength"
+                                              v-model="dynamicValidateForm.gene"
+                                    ></el-input>
+                                </el-form-item>
+
+                                <el-form-item prop="geneLen" style="height: 30px; margin-top: -5px">
+                                    <el-col :span="8" style="margin-left: 322px;">
+                                        <span style="float: right; height: 30px; line-height: 30px">
+                                            length: {[ dynamicValidateForm.geneLen ]}</span>
+                                    </el-col>
+                                </el-form-item>
+
+                                <h3>
+                                    Parameters For Gene Synthesis
+                                </h3>
+                                <div id="table" style="margin-left: 120px;">
+
+                                    <el-table
+                                            :data="dynamicValidateForm.tableData"
+                                            border
+                                            stripe
+                                            size="small"
+                                            style="width: 60%"
+                                            :cell-style="{'padding':'0px'}"
+                                            :header-cell-style="{'padding':'8px'}"
+                                    >
+                                        <el-table-column
+                                                prop="ion"
+                                                label="ion"
+                                                style="height: 26px!important; ">
+                                            <template slot-scope="scope">
+                                                <p v-html="scope.row.ion"
+                                                   style="margin: 0px; height: 26px!important;"></p>
+                                            </template>
+                                        </el-table-column>
+
+                                        <el-table-column
+                                                prop="concentration"
+                                                label="concentration">
+                                            <template slot-scope="scope">
+                                                <el-form-item
+                                                        :prop="'tableData.' + scope.$index + '.name'"
+                                                        style="margin: 1px"
+                                                >
+                                                    <el-input class="input_number"
+                                                              size="small"
+                                                              style="margin-left: -110px;"
+                                                              type='number'
+                                                              v-model.number="scope.row.data">{[scope.row.unit]}
+                                                    </el-input>
+
+                                                </el-form-item>
+                                            </template>
+                                        </el-table-column>
+                                    </el-table>
+                                </div>
+
+                                <h3>Overlap Length</h3>
+                                <el-form-item size="small">
+                                    <el-col :span="8">
+                                        <el-form-item prop="minLen" label="min:"
+                                                      class="el-form-item_line"
+                                                      required>
+                                            <el-input class="input_number"
+                                                      size="small"
+                                                      v-model="dynamicValidateForm.minLen"></el-input>
+                                        </el-form-item>
+                                    </el-col>
+
+                                    <el-col :span="8">
+                                        <el-form-item prop="maxLen" label="max:"
+                                                      class="el-form-item_line"
+                                                      required>
+                                            <el-input class="input_number"
+                                                      size="small"
+                                                      v-model="dynamicValidateForm.maxLen"></el-input>
+                                        </el-form-item>
+                                    </el-col>
+                                </el-form-item>
+
+                                <h3>Result Type</h3>
+                                <el-form-item prop="resultType">
+                                    <el-radio v-model="dynamicValidateForm.resultType" label="Gapless">
+                                        Gapless
+                                    </el-radio>
+                                    <el-radio v-model="dynamicValidateForm.resultType" label="Gap">Gap
+                                    </el-radio>
+                                </el-form-item>
+
+                                <h3>Long DNA Assembly(optional)</h3>
+                                <div style="margin-left: 100px">
+                                    <h4 style="margin-bottom: 15px;">Sequence will be partitioned into #of pools</h4>
+
+                                    <el-form-item label="#of pools:" style="margin-left: -17px" prop="pools"
+                                                  size="small"
+                                                  required>
+                                        <el-input class="input_number"
+                                                  size="small"
+                                                  v-model="dynamicValidateForm.pools"></el-input>
+                                    </el-form-item>
+
+                                </div>
+
+                                <h3>Is Verification Required</h3>
+                                <el-form-item prop="verification">
+                                    <el-radio style="width: 76px" v-model="dynamicValidateForm.verification "
+                                              label="No">No
+                                    </el-radio>
+                                    <el-radio v-model="dynamicValidateForm.verification " label="Yes">Yes
+                                    </el-radio>
+                                </el-form-item>
+
+                                <div v-if="dynamicValidateForm.verification == 'Yes'">
+                                    <el-form-item
+                                            size="small"
+                                            style="margin-left: 0px; ">
+                                        <el-col :span="8">
+                                            <el-form-item prop="temperature" label="temperature:"
+                                                          class="el-form-item_line"
+                                                          required>
+                                                <el-input class="input_number"
+                                                          size="small"
+                                                          v-model="dynamicValidateForm.temperature"></el-input>
+                                                &#8451;
+                                            </el-form-item>
+                                        </el-col>
+
+                                        <el-col :span="8">
+                                            <el-form-item prop="concentrations" label="concentrations:"
+                                                          class="el-form-item_line"
+                                                          required>
+                                                <el-input class="input_number"
+                                                          size="small"
+                                                          v-model="dynamicValidateForm.concentrations"></el-input>
+                                                mM
+                                            </el-form-item>
+                                        </el-col>
+                                    </el-form-item>
+                                </div>
+
+                                <el-form-item style="margin-top: 30px;">
+                                    <el-button style="margin-right: 70px; margin-left: 120px;" type="primary"
+                                               size="mini"
+                                               @click="submitForm(dynamicValidateForm)">submit
+                                    </el-button>
+                                    <el-button type="danger"
+                                               size="mini"
+                                               @click="resetForm('dynamicValidateForm')">default
+                                    </el-button>
+                                </el-form-item>
+                            </el-form>
+                        </el-tab-pane>
+
+                        {#output1#}
+                        <el-tab-pane v-if="output1" label="result" name="output1">
+                            <h3>result</h3>
+
+                            <div v-for="(item_i, i) in arr">
+                                {#result#}
+                                <el-divider content-position="left">
+                                    pool:
+                                    <span>{[ i+1 ]}</span>
+                                </el-divider>
+                                <el-table :data="item_i.info" border
+                                          :row-style="{height:'26px'}"
+                                          :cell-style="{padding:3+'px'}"
+                                          v-if="showTable"
+                                          stripe
+                                          :header-cell-style="{padding:3+'px', fontSize:'14px', align:'center'}">
+                                    <el-table-column v-for='(item_j,j) in dataColumn'
+                                                     :key="j"
+                                                     :label="item_j.name"
+                                                     :width="item_j.width"
+                                                     :cell-style="{padding:3+'px'}"
+                                                     show-overflow-tooltip>
+                                        <template slot-scope="scope">
+                                            {#TODO#}
+                                            {#{[ scope.row[j] ]}#}
+                                            {#<span v-if="">#}
+                                            {#    {[ scope.row[j] ]}#}
+                                            {#</span>     #}
+                                            {#<p v-html>#}
+                                            {#    {[ scope.row[j] ]}#}
+                                            {#</p>#}
+                                            <span v-html="scope.row[j]" @click="test(arr)"></span>
+
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+
+                                <div style="padding-top: 30px">
+                                    <el-table :data="item_i.resInfo"
+                                              :cell-style="{padding:3+'px'}"
+                                              :row-style="{height:'26px'}"
+                                              v-if="showTable"
+                                              border
+                                              stripe
+                                              :header-cell-style="{padding:3+'px', fontSize:'14px'}">
+
+                                        <el-table-column :cell-style="{padding:3+'px'}"
+                                                {#prop="key"#}
+                                                         align="center"
+                                                         label="key"
+                                                         show-overflow-tooltip>
+                                            <template slot-scope="scope">
+                                                {[ scope.row.key ]}
+                                            </template>
+                                        </el-table-column>
+
+                                        <el-table-column :cell-style="{padding:3+'px'}"
+                                                {#prop="value"#}
+                                                         align="center"
+                                                         label="value"
+                                                         show-overflow-tooltip>
+                                            <template slot-scope="scope">
+                                                {[ scope.row.value ]}
+                                            </template>
+                                        </el-table-column>
+                                    </el-table>
+                                </div>
+
+                                <div v-if="item_i.analyInfo">
+                                    <h3>Verification information</h3>
+                                    <el-table :data="item_i.analyInfo"
+                                              :cell-style="{padding:3+'px'}"
+                                              :row-style="{height:'26px'}"
+                                              border
+                                              v-if="showTable"
+                                              stripe
+                                              :header-cell-style="{padding:3+'px', fontSize:'14px'}">
+
+                                        <el-table-column :cell-style="{padding:3+'px'}"
+                                                {#prop="key"#}
+                                                         align="center"
+                                                         label="key"
+                                                         show-overflow-tooltip>
+                                            <template slot-scope="scope">
+                                                {[ scope.row.key ]}
+                                            </template>
+                                        </el-table-column>
+
+                                        <el-table-column :cell-style="{padding:3+'px'}"
+                                                {#prop="value"#}
+                                                         align="center"
+                                                         label="value"
+                                                         show-overflow-tooltip>
+                                            <template slot-scope="scope">
+                                                {[ scope.row.value ]}
+                                            </template>
+                                        </el-table-column>
+                                    </el-table>
+                                </div>
+
+                                <div
+                                        style="margin-left: 100px; margin-top: 40px;"
+                                        v-if="dynamicValidateForm.pools > 1
+                                        && dynamicValidateForm.verification == 'Yes'
+                                        && item_i.analyInfo == null"
+                                        v-loading="valificationLoading"
+                                >
+                                    <el-form>
+
+                                        <el-form-item
+                                                size="small"
+                                                style="margin-left: 0px; ">
+                                            <el-col :span="8">
+                                                <el-form-item
+                                                        label="temperature:"
+                                                        class="el-form-item_line"
+                                                        required>
+                                                    <el-input class="input_number"
+                                                              size="small"
+                                                              v-model="item_i.temperature"></el-input>
+                                                    &#8451;
+                                                </el-form-item>
+                                            </el-col>
+
+                                            <el-col :span="8">
+                                                <el-form-item
+                                                        label="concentrations:"
+                                                        class="el-form-item_line"
+                                                        required>
+                                                    <el-input class="input_number"
+                                                              size="small"
+                                                              v-model="item_i.concentrations"></el-input>
+                                                    mM
+                                                </el-form-item>
+                                            </el-col>
+                                        </el-form-item>
+
+
+                                        <el-button type="primary"
+                                                   size="mini"
+                                                   style="margin-left: 235px"
+                                                   @click="validation(i, item_i.nextCal, item_i.temperature, item_i.concentrations)">
+
+                                            Validation
+                                        </el-button>
+                                    </el-form>
+
+                                </div>
+                            </div>
+
+
+                            <div v-if="dynamicValidateForm.pools == 1" style="padding: 30px" v-loading="another_res">
+                                <el-button
+                                        style="margin-right: 70px; margin-left: 120px; "
+                                        type="primary"
+                                        size="mini"
+                                        @click="anotherResult(dynamicValidateForm)">another result
+                                </el-button>
+                                <el-button
+                                        style="margin-right: 70px; margin-left: 50px; "
+                                        type="primary"
+                                        size="mini"
+                                        @click="refreshTable()">Refresh table
+                                </el-button>
+                                <el-button
+                                        style="margin-right: 70px; margin-left: 50px; "
+                                        type="primary"
+                                        size="mini"
+                                        @click="download('res1')">download
+                                </el-button>
+
+                            </div>
+                            <div v-else>
+                                <el-button
+                                        style="margin-left: 235px; margin-top: 40px;"
+                                        type="primary"
+                                        size="mini"
+                                        @click="download('res1')">download
+                                </el-button>
+                            </div>
+
+                        </el-tab-pane>
+
+                        {#output2#}
+                        <el-tab-pane v-if="output2" label="result" name="output2">
+                            <h3>result</h3>
+
+                            <div v-for="(item_i, i) in anotherArr">
+                                <el-divider content-position="left">
+                                    pool:
+                                    <span>{[ i+1 ]}</span>
+                                </el-divider>
+                                <el-table :data="item_i.info" border
+                                          :row-style="{height:'26px'}"
+                                          :cell-style="{padding:3+'px'}"
+                                          v-if="showTable"
+                                          stripe
+                                          :header-cell-style="{padding:3+'px', fontSize:'14px', align:'center'}">
+                                    <el-table-column v-for='(item_j,j) in dataColumn'
+                                                     :key="j" :label="item_j.name"
+                                                     :width="item_j.width"
+                                                     :cell-style="{padding:3+'px'}"
+                                                     show-overflow-tooltip>
+                                        <template slot-scope="scope">
+                                            {[ scope.row[j] ]}
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+
+                                <div style="padding-top: 30px">
+                                    <el-table :data="item_i.resInfo"
+                                              :cell-style="{padding:3+'px'}"
+                                              :row-style="{height:'26px'}"
+                                              v-if="showTable"
+                                              border
+                                              stripe
+                                              :header-cell-style="{padding:3+'px', fontSize:'14px'}">
+
+                                        <el-table-column :cell-style="{padding:3+'px'}"
+                                                {#prop="key"#}
+                                                         align="center"
+                                                         label="key"
+                                                         show-overflow-tooltip>
+                                            <template slot-scope="scope">
+                                                {[ scope.row.key ]}
+                                            </template>
+                                        </el-table-column>
+
+                                        <el-table-column :cell-style="{padding:3+'px'}"
+                                                {#prop="value"#}
+                                                         align="center"
+                                                         label="value"
+                                                         show-overflow-tooltip>
+                                            <template slot-scope="scope">
+                                                {[ scope.row.value ]}
+                                            </template>
+                                        </el-table-column>
+                                    </el-table>
+                                </div>
+
+                                <div v-if="item_i.analyInfo">
+                                    <h3>Verification information</h3>
+                                    <el-table :data="item_i.analyInfo"
+                                              :cell-style="{padding:3+'px'}"
+                                              :row-style="{height:'26px'}"
+                                              border
+                                              v-if="showTable"
+                                              stripe
+                                              :header-cell-style="{padding:3+'px', fontSize:'14px'}">
+
+                                        <el-table-column :cell-style="{padding:3+'px'}"
+                                                {#prop="key"#}
+                                                         align="center"
+                                                         label="key"
+                                                         show-overflow-tooltip>
+                                            <template slot-scope="scope">
+                                                {[ scope.row.key ]}
+                                            </template>
+                                        </el-table-column>
+
+                                        <el-table-column :cell-style="{padding:3+'px'}"
+                                                {#prop="value"#}
+                                                         align="center"
+                                                         label="value"
+                                                         show-overflow-tooltip>
+                                            <template slot-scope="scope">
+                                                {[ scope.row.value ]}
+                                            </template>
+                                        </el-table-column>
+                                    </el-table>
+                                </div>
+
+                                <div
+                                        style="margin-left: 100px; margin-top: 40px;"
+                                        v-if="dynamicValidateForm.pools > 1
+                                        && dynamicValidateForm.verification == 'Yes'
+                                        && item_i.analyInfo == null">
+                                    <el-form>
+
+                                        <el-form-item
+                                                size="small"
+                                                style="margin-left: 0px; ">
+                                            <el-col :span="8">
+                                                <el-form-item
+                                                        label="temperature:"
+                                                        class="el-form-item_line"
+                                                        required>
+                                                    <el-input class="input_number"
+                                                              size="small"
+                                                              v-model="item_i.temperature"></el-input>
+                                                    &#8451;
+                                                </el-form-item>
+                                            </el-col>
+
+                                            <el-col :span="8">
+                                                <el-form-item
+                                                        label="concentrations:"
+                                                        class="el-form-item_line"
+                                                        required>
+                                                    <el-input class="input_number"
+                                                              size="small"
+                                                              v-model="item_i.concentrations"></el-input>
+                                                    mM
+                                                </el-form-item>
+                                            </el-col>
+                                        </el-form-item>
+
+
+                                        <el-button type="primary"
+                                                   size="mini"
+                                                   style="margin-left: 235px"
+                                                   @click="validation(i, item_i.nextCal, item_i.temperature, item_i.concentrations)">
+
+                                            Validation
+                                        </el-button>
+                                    </el-form>
+
+                                </div>
+                            </div>
+
+
+                            <div v-if="dynamicValidateForm.pools == 1" style="padding: 30px">
+                                <el-button
+                                        style="margin-right: 70px; margin-left: 120px; "
+                                        type="primary"
+                                        size="mini"
+                                        @click="lastResult()">Previous result
+                                </el-button>
+                                <el-button
+                                        style="margin-right: 70px; margin-left: 50px; "
+                                        type="primary"
+                                        size="mini"
+                                        @click="refreshTable()">Refresh table
+                                </el-button>
+
+                                <el-button
+                                        style="margin-right: 70px; margin-left: 50px; "
+                                        type="primary"
+                                        size="mini"
+                                        @click="download('res2')">download
+                                </el-button>
+                            </div>
+
+                        </el-tab-pane>
+
+                    </el-tabs>
+
+                </div>
+            </el-container>
+
+            {#<div class="footer-style footer-font">#}
+            {#    Copyright © 2020 - 2021 Caltech. All rights reserved. <a href="mailto:jacka03@163.com">suggestion</a>#}
+            {#</div>#}
+
+        </el-main>
+    </el-container>
+
+</div>
+
+</body>
+
+<script src="../static/js/vue.js"></script>
+<script src="../static/js/axios-0.18.0.js"></script>
+<script src="../static/js/jquery.min.js"></script>
+<script src="../static/element-ui/lib/index.js"></script>
+
+<script>
+    new Vue({
+        el: '#app',
+        delimiters: ['{[', ']}'],
+        data() {
+            return {
+                output1: false,
+                output2: false,
+
+                showTable: true,
+                loading: false,
+                valificationLoading: false,
+                another_res: false,
+
+                activeIndex: 'second',
+                activeName: 'input',
+
+                dynamicValidateForm: {
+                    email: null,
+                    geneLen: 0,
+                    result: 'res1',
+                    minLen: 20,
+                    maxLen: 30,
+                    resultType: 'Gap',
+                    verification: 'No',
+                    pools: 1,
+                    tableData: [
+                        {#{#}
+                        {#    name: 'Na',#}
+                        {#    data: 1.1,#}
+                        {#    ion: 'Na<sup>+</sup> (0.5-1.5M)',#}
+                        {#    unit: 'M',#}
+                        {# }, #}
+                        {
+                            name: 'K',
+                            data: 50,
+                            ion: 'Na<sup>+</sup> / K<sup>+</sup> (1-1000mM)',
+                            unit: 'mM',
+                        }, {
+                            name: 'Mg',
+                            data: 8,
+                            ion: 'Mg<sup>2+</sup> (1-1000mM)',
+                            unit: 'mM',
+                        }, {
+                            name: 'dNTPs',
+                            data: 4,
+                            ion: 'dNTPs (1-1000mM)',
+                            unit: 'mM',
+                        }, {
+                            name: 'Tris',
+                            data: 10,
+                            ion: 'Tris<sup>2+</sup> (1-1000mM)',
+                            unit: 'mM',
+                        }, {
+                            name: 'oligo',
+                            data: 10,
+                            ion: 'oligo (0.1-1000nM)',
+                            unit: 'mM',
+                        }, {
+                            name: 'primer',
+                            data: 400,
+                            ion: 'primer (0.1-1000nM)',
+                            unit: 'mM',
+                        }],
+                    geneName: null,
+                    geneDesc: null,
+                    temperature: 37,
+                    concentrations: 1,
+                    gene: null,
+                },
+
+                dataColumn: [
+                    {
+                        name: 'index',
+                        width: 95,
+                    },
+                    {
+                        name: 'gene',
+                        width: 625,
+                    },
+                    {
+                        name: 'Tm',
+                        width: 70,
+                    },
+                    {
+                        name: 'overlap',
+                        width: 88,
+                    },
+                    {
+                        name: 'length',
+                        width: 75,
+                    },
+                ],
+
+                arr: [],
+                anotherArr: [],
+            }
+        },
+
+        created() {
+            {#this.calGeneLength();#}
+        },
+
+        methods: {
+
+            test(resArr) {
+                // view tail
+                source = resArr[resArr.length - 1];
+                {#TODO#}
+                if (source.resInfo[5] != undefined) {
+                    var tail = source.resInfo[5].value
+                    tail = tail.split("").reverse().join("")
+                    endTail = "";
+                    for (var i = 0; i < tail.length; i++) {
+                        if (tail[i] == 'A') {
+                            endTail += 'T';
+                        } else if (tail[i] == 'T') {
+                            endTail += 'A';
+                        } else if (tail[i] == 'C') {
+                            endTail += 'G';
+                        } else if (tail[i] == 'G') {
+                            endTail += 'C';
+                        }
+                    }
+                }
+                replaceStr = '<span style="color:red;">' + endTail + '</span>';
+                index = resArr[resArr.length - 1]["info"].length - 3;
+                str = resArr[resArr.length - 1]["info"][index][1];
+                str = str.replace(endTail, replaceStr);
+                resArr[resArr.length - 1]["info"][index][1] = str;
+                return resArr;
+            },
+
+            dateFormat(fmt, date) {
+                let ret;
+                const opt = {
+                    "Y+": date.getFullYear().toString(),        // 年
+                    "m+": (date.getMonth() + 1).toString(),     // 月
+                    "d+": date.getDate().toString(),            // 日
+                    "H+": date.getHours().toString(),           // 时
+                    "M+": date.getMinutes().toString(),         // 分
+                    "S+": date.getSeconds().toString()          // 秒
+                    // 有其他格式化字符需求可以继续添加，必须转化成字符串
+                };
+
+                for (let k in opt) {
+                    ret = new RegExp("(" + k + ")").exec(fmt);
+                    if (ret) {
+                        fmt = fmt.replace(ret[1], (ret[1].length === 1) ? (opt[k]) : (opt[k].padStart(ret[1].length, "0")))
+                    }
+
+                }
+
+                return fmt;
+            },
+
+            download(res) {
+                var that = this;
+                var input = that.arr;
+
+                if (res == 'res2') {
+                    input = that.anotherArr;
+                }
+                {#console.log(this.arr);#}
+                axios.post("/download/", input, {responseType: 'blob'}).then(function (response) {
+                    {#console.log(response);#}
+                    var time = that.dateFormat("YYYY-mm-dd-HH:MM", new Date());
+                    {#console.log(time);#}
+                    const blob = new Blob([response.data]);//处理文档流
+                    const fileName = that.dynamicValidateForm.geneName + "_" + time + '.xlsx';
+                    const elink = document.createElement('a');
+                    elink.download = fileName;
+                    elink.style.display = 'none';
+                    elink.href = URL.createObjectURL(blob);
+                    document.body.appendChild(elink);
+                    elink.click();
+                    URL.revokeObjectURL(elink.href); // 释放URL 对象
+                    document.body.removeChild(elink);
+
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+
+            testDemo() {
+                this.dynamicValidateForm.email = '758168660@qq.com';
+                this.dynamicValidateForm.geneDesc = 'description';
+                this.dynamicValidateForm.geneName = 'name';
+                this.dynamicValidateForm.gene = 'taagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacagttgcgcagcctgaataataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata';
+                this.dynamicValidateForm.geneLen = this.dynamicValidateForm.gene.length;
+
+                {#var date = new Date();#}
+                {#console.log(this.dateFormat("YYYY-mm-dd_HH:MM", date))#}
+            },
+
+            lastResult() {
+                this.activeName = 'output1';
+            },
+
+            refreshTable() {
+                let that = this;
+                that.showTable = false;
+                that.$nextTick(() => that.showTable = true);
+            },
+
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            },
+
+            submitForm(formData) {
+                if (this.dynamicValidateForm.email == null) {
+                    this.$message({
+                            message: 'Please enter your email address',
+                            type: "warning"
+                        }
+                    );
+                    return;
+                }
+
+                if (this.dynamicValidateForm.gene == null) {
+                    this.$message({
+                        message: 'please enter the gene seq',
+                        type: "warning"
+                    });
+                    return;
+                }
+                var that = this;
+                {#TODO#}
+                {#that.arr = [#}
+                {#    {#}
+                {#        "info": [#}
+                {#            [#}
+                {#                "F0",#}
+                {#                '<span style="color:red;">TAAGCACCTGTAGGATCGTACAGGTTTACG</span>CAAGAAAATGGTTTGTT',#}
+                {#                57.93,#}
+                {#                25,#}
+                {#                47#}
+                {#            ],#}
+                {#            [#}
+                {#                "R0",#}
+                {#                "ACGCACGGTGTTATTCGACTATAACAAACCATTTTCTTGCGTAAACC",#}
+                {#                57.78,#}
+                {#                22,#}
+                {#                47#}
+                {#            ],#}
+                {#            [#}
+                {#                "F1",#}
+                {#                "ATAGTCGAATAACACCGTGCGTGTTGACTATTTTACCTCTGGCGG",#}
+                {#                57.78,#}
+                {#                23,#}
+                {#                45#}
+                {#            ],#}
+                {#            [#}
+                {#                "R1",#}
+                {#                "TCTAGTATTTCTCCTCTTTCTCTAGTATATCACCGCCAGAGGTAAAATAGTCAAC",#}
+                {#                58.08,#}
+                {#                32,#}
+                {#                55#}
+                {#            ],#}
+                {#            [#}
+                {#                "F2",#}
+                {#                "TGATATACTAGAGAAAGAGGAGAAATACTAGATGACCATGATTACGCCAAGCG",#}
+                {#                59.1,#}
+                {#                21,#}
+                {#                53#}
+                {#            ],#}
+                {#            [#}
+                {#                "R2",#}
+                {#                "TTCCCTTTAGTGAGGGTTAATTGCGCGCTTGGCGTAATCATGGTCA",#}
+                {#                59.83,#}
+                {#                25,#}
+                {#                46#}
+                {#            ],#}
+                {#            [#}
+                {#                "F3",#}
+                {#                "CGCAATTAACCCTCACTAAAGGGAACAAAAGCTGGAGCTCCACCG",#}
+                {#                59.57,#}
+                {#                20,#}
+                {#                45#}
+                {#            ],#}
+                {#            [#}
+                {#                "R3",#}
+                {#                "AGTGCTGCCGCCACCGCGGTGGAGCTCCAGCTTTTG",#}
+                {#                59.71,#}
+                {#                16,#}
+                {#                36#}
+                {#            ],#}
+                {#            [#}
+                {#                "F4",#}
+                {#                "CGGTGGCGGCAGCACTAGAGCTAGTGGATCCCCCGG",#}
+                {#                59.21,#}
+                {#                19,#}
+                {#                36#}
+                {#            ],#}
+                {#            [#}
+                {#                "R4",#}
+                {#                "CGATAAGCTTGATATCGAATTTCTACAGCCCGGGGGATCCACTAGCTC",#}
+                {#                59.98,#}
+                {#                29,#}
+                {#                48#}
+                {#            ],#}
+                {#            [#}
+                {#                "F5",#}
+                {#                "GCTGTAGAAATTCGATATCAAGCTTATCGATACCGTCGACCTCGAGGGG",#}
+                {#                60.38,#}
+                {#                19,#}
+                {#                49#}
+                {#            ],#}
+                {#            [#}
+                {#                "R5",#}
+                {#                "CGAATTGGGTACCGGGCCCCCCCTCGAGGTCGACGGTA",#}
+                {#                61.02,#}
+                {#                19,#}
+                {#                38#}
+                {#            ],#}
+                {#            [#}
+                {#                "F6",#}
+                {#                "GGGCCCGGTACCCAATTCGCCCTATAGTGAGTCGTATTACGCG",#}
+                {#                59.07,#}
+                {#                24,#}
+                {#                43#}
+                {#            ],#}
+                {#            [#}
+                {#                "R6",#}
+                {#                "ACGACGGCCAGTGAGCGCGCGTAATACGACTCACTATAGGG",#}
+                {#                59.53,#}
+                {#                17,#}
+                {#                41#}
+                {#            ],#}
+                {#            [#}
+                {#                "F7",#}
+                {#                "CGCTCACTGGCCGTCGTTTTACAACGTCGTGACTGGGAAAACC",#}
+                {#                60.51,#}
+                {#                22,#}
+                {#                43#}
+                {#            ],#}
+                {#            [#}
+                {#                "R7",#}
+                {#                "GCGATTAAGTTGGGTAACGCCAGGGTTTTCCCAGTCACGACGTTG",#}
+                {#                59.47,#}
+                {#                22,#}
+                {#                45#}
+                {#            ],#}
+                {#            [#}
+                {#                "F8",#}
+                {#                "TGGCGTTACCCAACTTAATCGCCTTGCAGCACATCCCCCTTTC",#}
+                {#                60.03,#}
+                {#                21,#}
+                {#                43#}
+                {#            ],#}
+                {#            [#}
+                {#                "R8",#}
+                {#                "CGCTATTACGCCAGCTGGCGAAAGGGGGATGTGCTGCAAG",#}
+                {#                59.36,#}
+                {#                19,#}
+                {#                40#}
+                {#            ],#}
+                {#            [#}
+                {#                "F9",#}
+                {#                "GCCAGCTGGCGTAATAGCGAAGAGGCCCGCACCGATCG",#}
+                {#                58.8,#}
+                {#                16,#}
+                {#                38#}
+                {#            ],#}
+                {#            [#}
+                {#                "R9",#}
+                {#                "GCGCAACTGTTGGGAAGGGCGATCGGTGCGGGCCT",#}
+                {#                59.7,#}
+                {#                19,#}
+                {#                35#}
+                {#            ],#}
+                {#            [#}
+                {#                "F10",#}
+                {#                "CCCTTCCCAACAGTTGCGCAGCCTGAATAATAACGCTGATAGTGCTA",#}
+                {#                60,#}
+                {#                27,#}
+                {#                47#}
+                {#            ],#}
+                {#            [#}
+                {#                "R10",#}
+                {#                "CCTGGCTCTAGTAGCGATCTACACTAGCACTATCAGCGTTATTATTCAGGC",#}
+                {#                59.14,#}
+                {#                23,#}
+                {#                51#}
+                {#            ],#}
+                {#            [#}
+                {#                "F11",#}
+                {#                "TGTAGATCGCTACTAGAGCCAGGCATCAAATAAAACGAAAGGCTCAGTCG",#}
+                {#                59.09,#}
+                {#                26,#}
+                {#                50#}
+                {#            ],#}
+                {#            [#}
+                {#                "R11",#}
+                {#                "CAGATAAAACGAAAGGCCCAGTCTTTCGACTGAGCCTTTCGTTTTATTTGAT",#}
+                {#                59.45,#}
+                {#                24,#}
+                {#                52#}
+                {#            ],#}
+                {#            [#}
+                {#                "F12",#}
+                {#                "AGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTC",#}
+                {#                59.56,#}
+                {#                22,#}
+                {#                46#}
+                {#            ],#}
+                {#            [#}
+                {#                "R12",#}
+                {#                "AGGTGAGCCAGTGTGACTCTAGTAGAGAGCGTTCACCGACAAACAA",#}
+                {#                59.31,#}
+                {#                22,#}
+                {#                46#}
+                {#            ],#}
+                {#            [#}
+                {#                "F13",#}
+                {#                "CTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGT",#}
+                {#                59.93,#}
+                {#                18,#}
+                {#                42#}
+                {#            ],#}
+                {#            [#}
+                {#                "R13",#}
+                {#                "GTGCCTTAATCTATCTTCAGGAACTGTATAAACGCAGAAAGGCCCACCC",#}
+                {#                60.32,#}
+                {#                31,#}
+                {#                49#}
+                {#            ],#}
+                {#            [#}
+                {#                "F_Primer",#}
+                {#                "TAAGCACCTGTAGGATCGTACA",#}
+                {#                56.12,#}
+                {#                "",#}
+                {#                22#}
+                {#            ],#}
+                {#            [#}
+                {#                "R_Primer",#}
+                {#                "GTGCCTTAATCTATCTTCAGGAACTGTATAA",#}
+                {#                60.32,#}
+                {#                "",#}
+                {#                31#}
+                {#            ]#}
+                {#        ],#}
+                {#        "resInfo": [#}
+                {#            {#}
+                {#                "key": "min",#}
+                {#                "value": 57.78#}
+                {#            },#}
+                {#            {#}
+                {#                "key": "max",#}
+                {#                "value": 61.02#}
+                {#            },#}
+                {#            {#}
+                {#                "key": "range",#}
+                {#                "value": 3.24#}
+                {#            },#}
+                {#            {#}
+                {#                "key": "mean",#}
+                {#                "value": 59.42#}
+                {#            },#}
+                {#            {#}
+                {#                "key": "std",#}
+                {#                "value": 0.79#}
+                {#            },#}
+                {#            {#}
+                {#                "key": "tail",#}
+                {#                "value": "CAGTTCCTGAAGATAGATTAAGGCAC"#}
+                {#            }#}
+                {#        ],#}
+                {#        "nextCal": [#}
+                {#            [#}
+                {#                "TAAGCACCTGTAGGATCGTACAGGTTTACGCAAGAAAATGGTTTGTT",#}
+                {#                "ATAGTCGAATAACACCGTGCGTGTTGACTATTTTACCTCTGGCGG",#}
+                {#                "TGATATACTAGAGAAAGAGGAGAAATACTAGATGACCATGATTACGCCAAGCG",#}
+                {#                "CGCAATTAACCCTCACTAAAGGGAACAAAAGCTGGAGCTCCACCG",#}
+                {#                "CGGTGGCGGCAGCACTAGAGCTAGTGGATCCCCCGG",#}
+                {#                "GCTGTAGAAATTCGATATCAAGCTTATCGATACCGTCGACCTCGAGGGG",#}
+                {#                "GGGCCCGGTACCCAATTCGCCCTATAGTGAGTCGTATTACGCG",#}
+                {#                "CGCTCACTGGCCGTCGTTTTACAACGTCGTGACTGGGAAAACC",#}
+                {#                "TGGCGTTACCCAACTTAATCGCCTTGCAGCACATCCCCCTTTC",#}
+                {#                "GCCAGCTGGCGTAATAGCGAAGAGGCCCGCACCGATCG",#}
+                {#                "CCCTTCCCAACAGTTGCGCAGCCTGAATAATAACGCTGATAGTGCTA",#}
+                {#                "TGTAGATCGCTACTAGAGCCAGGCATCAAATAAAACGAAAGGCTCAGTCG",#}
+                {#                "AGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTC",#}
+                {#                "CTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGT",#}
+                {#                "TTATACAGTTCCTGAAGATAGATTAAGGCAC"#}
+                {#            ],#}
+                {#            [#}
+                {#                "TGTACGATCCTACAGGTGCTTA",#}
+                {#                "ACGCACGGTGTTATTCGACTATAACAAACCATTTTCTTGCGTAAACC",#}
+                {#                "TCTAGTATTTCTCCTCTTTCTCTAGTATATCACCGCCAGAGGTAAAATAGTCAAC",#}
+                {#                "TTCCCTTTAGTGAGGGTTAATTGCGCGCTTGGCGTAATCATGGTCA",#}
+                {#                "AGTGCTGCCGCCACCGCGGTGGAGCTCCAGCTTTTG",#}
+                {#                "CGATAAGCTTGATATCGAATTTCTACAGCCCGGGGGATCCACTAGCTC",#}
+                {#                "CGAATTGGGTACCGGGCCCCCCCTCGAGGTCGACGGTA",#}
+                {#                "ACGACGGCCAGTGAGCGCGCGTAATACGACTCACTATAGGG",#}
+                {#                "GCGATTAAGTTGGGTAACGCCAGGGTTTTCCCAGTCACGACGTTG",#}
+                {#                "CGCTATTACGCCAGCTGGCGAAAGGGGGATGTGCTGCAAG",#}
+                {#                "GCGCAACTGTTGGGAAGGGCGATCGGTGCGGGCCT",#}
+                {#                "CCTGGCTCTAGTAGCGATCTACACTAGCACTATCAGCGTTATTATTCAGGC",#}
+                {#                "CAGATAAAACGAAAGGCCCAGTCTTTCGACTGAGCCTTTCGTTTTATTTGAT",#}
+                {#                "AGGTGAGCCAGTGTGACTCTAGTAGAGAGCGTTCACCGACAAACAA",#}
+                {#                "GTGCCTTAATCTATCTTCAGGAACTGTATAAACGCAGAAAGGCCCACCC"#}
+                {#            ],#}
+                {#            29#}
+                {#        ]#}
+                {#    }#}
+                {#];#}
+                {#that.arr = that.test(that.arr)#}
+                {#console.log(that.arr)#}
+                {#that.activeName = 'output1';#}
+                {#that.output1 = true;#}
+                {#that.loading = false;#}
+                {#return;#}
+
+                {#console.log(formData);#}
+                that.loading = true;
+                that.output1 = false;
+                that.output2 = false;
+                that.arr = [];
+                that.anotherArr = [];
+
+                {#console.log(that.dynamicValidateForm.tableData)#}
+
+                if (that.dynamicValidateForm.pools === 1) {
+                    axios.post("/assembly/", formData).then(function (response) {
+                        {#console.log(response);#}
+
+                        that.arr = response.data.arr;
+                        that.arr = that.test(that.arr)
+                        {#console.log(that.arr);#}
+                        {#that.arr[that.arr.length-1]["info"][26][1] = "<font color=red >aa</font>"#}
+
+                        that.activeName = 'output1';
+                        that.output1 = true;
+                        that.loading = false;
+
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                } else {
+                    axios.post("/assemblyPools/", formData).then(function (response) {
+                        {#console.log(response);#}
+                        {#console.log(that.dynamicValidateForm.verification)#}
+                        that.arr = response.data.arr;
+                        that.arr = that.test(that.arr)
+
+                        that.activeName = 'output1';
+                        that.output1 = true;
+                        that.loading = false;
+
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                }
+                {#that.test();#}
+            },
+
+            validation(index, nextCal, tem, concentrations) {
+                var that = this;
+
+                nextCal.push(tem);
+                nextCal.push(concentrations);
+
+                {#console.log(index);#}
+                {#console.log(nextCal);#}
+                that.valificationLoading = true;
+                that.loading = true;
+                axios.post("/analysis/", nextCal).then(function (response) {
+
+                    that.arr[index]["analyInfo"] = response.data.analyInfo;
+
+                    {#console.log(that.arr[index])#}
+                    {#console.log(response.data.analyInfoList);#}
+
+                    that.dynamicValidateForm.pools = 1;
+                    that.$nextTick(() => that.dynamicValidateForm.pools = 2);
+
+                    that.valificationLoading = false;
+                    that.loading = false;
+
+                }).catch(function (error) {
+
+                    console.log(error);
+                });
+
+            },
+
+            anotherResult(formData) {
+                if (this.anotherArr.length !== 0) {
+                    this.activeName = 'output2';
+
+                } else {
+                    var that = this;
+                    formData.result = 'res2';
+                    that.another_res = true;
+                    axios.post("/assembly/", formData).then(function (response) {
+
+                        {#console.log(response);#}
+                        {#console.log(that.dynamicValidateForm.verification)#}
+                        that.anotherArr = response.data.arr;
+                        that.anotherArr = that.test(that.anotherArr)
+                        console.log(that.anotherArr)
+
+                        that.activeName = 'output2';
+                        that.output2 = true;
+                        that.loading = false;
+                        that.another_res = false;
+
+                        {#that.activeName = 'output2';#}
+                    }).catch(function (error) {
+
+                        console.log(error);
+                    });
+                }
+            },
+
+            calGeneLength() {
+                this.dynamicValidateForm.geneLen = this.dynamicValidateForm.gene.length;
+            },
+        },
+
+
+    });
+
+</script>
+</html>

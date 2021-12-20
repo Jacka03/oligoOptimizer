@@ -1,0 +1,31 @@
+.input_style {
+    width: 300px;
+}
+.input_number {
+    width: 100px;
+    /*background-color: gold;*/
+}
+
+.el-textarea__inner {
+    width: 600px;
+    font-size: 16px;
+}
+
+/*.el-input__inner{*/
+/*    height: 30px;*/
+/*    !*line-height: 30px;*!*/
+/*}*/
+/*.el-input--suffix {*/
+/*    line-height: 30px;*/
+/*}*/
+.el-form-item__label {
+    /*width: 120px;*/
+}
+
+/*.el-form-item__content {*/
+/*    height: 32px;*/
+/*    line-height: 33px;*/
+/*}*/
+.el-form-item_line {
+    margin-left: -37px;
+}

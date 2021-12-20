@@ -4,22 +4,23 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-def show_w(x, y, head):
+def show_w(x, y, title):
+    # 打印index与tm的图
     plt.scatter(x, y)
     plt.plot(x, y)
     tem_str = "min:{:3f},max:{:3f},max-min={:3f},std={:4f}".format(min(y), max(y), max(y) - min(y), np.std(y))
     plt.legend([tem_str])
-    plt.title(head)
+    plt.title(title)
     plt.show()
 
 
-def cal_interval(list):
+def show_each_gene_len(index_list):
+    # 打印每个片段的长度
     res = []
-    for i in range(1, len(list)):
-        res.append(list[i] - list[i-1])
+    for i in range(1, len(index_list)):
+        res.append(index_list[i] - index_list[i - 1])
     print(res)
     print("min:{0}, max:{1}".format(min(res), max(res)))
-    return res
 
 
 class Splicing:
@@ -170,7 +171,7 @@ class Splicing:
 
     def cal_next_tm(self, tm_mea=0.):
         """
-        计算第三段到最后的切割位点
+        计算第三段到最后的切割位点,贪心算法
         :return:
         """
         result = self.cal_first_tm(tm_mea)
@@ -225,7 +226,7 @@ class Splicing:
         index_res = np.array(fir_ans_tem[0][:-1:2])
         tm_res = np.array(fir_ans_tem[0][1::2])
 
-        show_w(index_res, tm_res, "greedy")
+        # show_w(index_res, tm_res, "greedy")
         return index_res, tm_res
 
     def cal_all_tm(self, arr):
@@ -252,7 +253,7 @@ class Splicing:
         tem_max_len = self.max_len + 5
         tem_min_len = self.min_len - 5
         bias_len = 5
-        while flag[-1] != flag[-3]:
+        while flag[-1] != flag[-2]:
             for i in range(len(tm_list)):  # 对于整条
                 left = index_list[i]
                 right = index_list[i + 1]
@@ -298,12 +299,13 @@ class Splicing:
                 best_std, tm_list = self.cal_all_tm(index_list)  # 本次迭代得到最好的std和tm_list
 
             flag.append(best_std)
-            show_w(index_list[1:], tm_list, "d")
-        show_w(index_list[1:], tm_list, "iteration")
+        #     show_w(index_list[1:], tm_list, "d")
+        # show_w(index_list[1:], tm_list, "iteration")
 
         return index_list, tm_list
 
     def overlap(self, index_list, tm_list):
+        # 动态规划
         # print(index_list)
         # index_list = index_list.astype(int)
         index_list = [int(i) for i in index_list]
@@ -353,7 +355,7 @@ class Splicing:
             x = x + 1
             # show_w(index_list[1:], tm_list, x)
 
-        show_w(index_list[1:], tm_list, "overlap")
+        # show_w(index_list[1:], tm_list, "overlap")
 
         a = np.argsort(tm_list)
 
@@ -383,7 +385,7 @@ class Splicing:
             gene_list[a[i]][4] = test_result[0, 2]
             tm_list[a[i]] = test_result[0, 2]
 
-        show_w(index_list[1:], tm_list, "end")
+        # show_w(index_list[1:], tm_list, "end")
 
         # for i in range(len(gene_list) - 1):
         #     print(gene_list[i + 1][1] - gene_list[i][2], end=" ")
@@ -494,7 +496,7 @@ class Splicing:
         len_g2 = len(list_g2)
         len_info = len(info)
         result = []
-        print(len_g1, len_g2, x1, x2)
+        # print(len_g1, len_g2, x1, x2)
         for i in range(max(len_g1, len_g2)):
             if i < len_g1 - 1:
                 result.append(info[i])
@@ -533,31 +535,47 @@ class Splicing:
 
         return overlap_data
 
+    def cal_mean_std(self, index):
+        # 根据一个切割位点list转化为[[i1, i1, i2, i2, tm], ...]的形式, 方便后面计算这种切割的overlap的tm
+        tem_res = []
+        for i in range(1, len(index)):
+            tem_gene = self.gene[int(index[i - 1]):int(index[i])]
+            tem_res.append([int(index[i - 1]), int(index[i - 1]), int(index[i]), int(index[i]), self.cal_tm(tem_gene)])
+        # print(tem_res)
+        return tem_res
+
+    def return_result(self, index, tm):
+        if self.res_type == 'Gapless':
+            return self.cal_mean_std(index)
+        elif self.res_type == 'Gap':
+            return self.overlap(index, tm)
+
     def cal(self):
         index, tm = self.cal_next_tm()
-        cal_interval(index)
+        show_each_gene_len(index)
         index, tm = self.cal_next_tm(np.mean(tm))
-        cal_interval(index)
-
-        if len(index) % 2 == 0:  # add tail
+        show_each_gene_len(index)
+        # add tail
+        if len(index) % 2 == 0:
             index, tm = self.input_tail(index, tm)
 
         index = np.insert(index, 0, [0])
-        cal_interval(index)
+        show_each_gene_len(index)
         index, tm = self.iteration(index, tm)
-        cal_interval(index)
+        show_each_gene_len(index)
 
-        cut_of_index = self.overlap(index, tm)
+        # Gap or Gapless
+        cut_of_index = self.return_result(index, tm)
+
         res1, res2 = self.get_gene_list(cut_of_index)
-
         info = self.get_more_info(res1, res2, cut_of_index)
 
         next_cal = [res1, res2, len(cut_of_index)]
-        print(next_cal)
+        # print(next_cal)
         return next_cal, info
 
 
 if __name__ == '__main__':
-    data = {'email': '758168660@qq.com', 'geneLen': 638, 'result': 'res1', 'minLen': 20, 'maxLen': 30, 'resultType': 'Gap', 'verification': 'No', 'pools': 1, 'geneName': 'name', 'geneDesc': 'description', 'temperature': 37, 'concentrations': 1, 'gene': 'taagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacagttgcgcagcctgaataataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata', 'K': 50, 'Mg': 8, 'dNTPs': 4, 'Tris': 10, 'oligo': 10, 'primer': 400, 'Na': 1.2}
+    data = {'email': '758168660@qq.com', 'geneLen': 638, 'result': 'res1', 'minLen': 20, 'maxLen': 30, 'resultType': 'Gapless', 'verification': 'No', 'pools': 1, 'geneName': 'name', 'geneDesc': 'description', 'temperature': 37, 'concentrations': 1, 'gene': 'taagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacagttgcgcagcctgaataataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata', 'K': 50, 'Mg': 8, 'dNTPs': 4, 'Tris': 10, 'oligo': 10, 'primer': 400, 'Na': 1.2}
     sp = Splicing(data)
     sp.cal()

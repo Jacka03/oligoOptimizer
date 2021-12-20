@@ -301,14 +301,104 @@ class Splicing:
 
         return index_list, tm_list
 
+    def overlap(self, index_list, tm_list):
+        # print(index_list)
+        # index_list = index_list.astype(int)
+        index_list = [int(i) for i in index_list]
+        gene_list = []
+        for i in range(len(tm_list)):  # 将gene截取出来存放在一个二维list中
+            # 【原来第一个切割位点，修改后第一个切割位点，原来第二个切割位点，修改后第二个切割位点，修改后片段tm】
+            gene_list.append([index_list[i], index_list[i], index_list[i + 1], index_list[i + 1], tm_list[i]])
+
+        over_size = 6
+        temp_avg_tm = [0, 1]  # flag 结束迭代的标志
+
+        tem_max_op = 10  # 相邻两个片段间隔最大值
+
+        tem_min_len = self.min_len - 10  # 切割后每个片段最小值
+
+        x = 0
+        while temp_avg_tm[-1] != temp_avg_tm[-2]:  # 迭代，终止条件
+
+            for i in range(len(gene_list)):
+                new_tm_list = tm_list.copy()
+                tem_result = []
+                for j in range(over_size):
+                    for k in range(over_size):
+                        left = gene_list[i][1] + j
+                        right = gene_list[i][2] - k
+
+                        if right - left < tem_min_len:  # 长度小于限定值
+                            continue
+                        if (i == 0 and gene_list[i][1] - 0 > tem_max_op) or (
+                                i > 0 and left - gene_list[i - 1][2] > tem_max_op):  # 这段与前一段的距离
+                            continue
+                        if (i + 1 == len(gene_list) and len(self.gene) - gene_list[i][2] - 1 > tem_max_op) or (
+                                i + 1 < len(gene_list) and gene_list[i + 1][1] - right > tem_max_op):
+                            continue
+
+                        tem_tm = self.cal_tm(self.gene[left: right])
+                        new_tm_list[i] = tem_tm
+                        tm_std = np.std(new_tm_list)
+                        tem_result.append([left, right, tem_tm, tm_std])
+                if len(tem_result) == 0:
+                    continue
+                tem_result = self.choose(tem_result, 1)
+                gene_list[i][1] = int(tem_result[0, 0])
+                gene_list[i][2] = int(tem_result[0, 1])
+                tm_list[i] = tem_result[0, 2]
+                temp_avg_tm.append(tem_result[0, 3])
+            x = x + 1
+            # show_w(index_list[1:], tm_list, x)
+
+        show_w(index_list[1:], tm_list, "overlap")
+
+        a = np.argsort(tm_list)
+
+        # 经过剪切后，在迭代一次，进行扩展
+        for i in range(len(a)):
+            if a[i] < 1 or a[i] + 2 > len(a):  # 先不管第一段和最后一段
+                continue
+            test_tm_list = tm_list.copy()
+            test_result = []
+            for j in range(int(gene_list[a[i]][1] - gene_list[a[i] - 1][2])):
+                # print(gene_list[a[i] + 1][1], gene_list[a[i]][2], gene_list[a[i] + 1][1] - gene_list[a[i]][2])
+                for k in range(int(gene_list[a[i] + 1][1] - gene_list[a[i]][2])):
+                    # print(gene_list[a[i]][1], gene_list[a[i]][1] - j)
+                    # print(gene_list[a[i]][2], gene_list[a[i]][2] + k)
+                    test_gene = self.gene[gene_list[a[i]][1] - j: gene_list[a[i]][2] + k]
+                    test_tm = self.cal_tm(test_gene)
+                    # print(test_tm, gene_list[a[i]][4])
+                    test_tm_list[a[i]] = test_tm
+                    test_std = np.std(test_tm_list)
+                    test_result.append([gene_list[a[i]][1] - j, gene_list[a[i]][2] + k, test_tm, test_std])
+            if len(test_result) == 0:
+                continue
+            # 下表从0开始
+            test_result = self.choose(test_result, 1)
+            gene_list[a[i]][1] = test_result[0, 0]
+            gene_list[a[i]][2] = test_result[0, 1]
+            gene_list[a[i]][4] = test_result[0, 2]
+            tm_list[a[i]] = test_result[0, 2]
+
+        show_w(index_list[1:], tm_list, "end")
+
+        # for i in range(len(gene_list) - 1):
+        #     print(gene_list[i + 1][1] - gene_list[i][2], end=" ")
+        # print()
+        return gene_list
+
     def cal(self):
         index, tm = self.cal_next_tm()
+        cal_interval(index)
         index, tm = self.cal_next_tm(np.mean(tm))
         cal_interval(index)
         index = np.insert(index, 0, [0])
         cal_interval(index)
         index, tm = self.iteration(index, tm)
         cal_interval(index)
+
+        self.overlap(index, tm)
 
 
 if __name__ == '__main__':

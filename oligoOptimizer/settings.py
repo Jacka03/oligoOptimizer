@@ -92,18 +92,18 @@ WSGI_APPLICATION = 'oligoOptimizer.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'rm-bp14u7355cr17d2fv2o.mysql.rds.aliyuncs.com',
-        'PORT': 3306,
-        'USER': 'biocomputing',
-        'PASSWORD': '6IWq7rd3@J',
-        'NAME': 'biocomputing',
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            'charset': 'utf8mb4'
-        }
-    }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'HOST': 'rm-bp14u7355cr17d2fv2o.mysql.rds.aliyuncs.com',
+    #     'PORT': 3306,
+    #     'USER': 'biocomputing',
+    #     'PASSWORD': '6IWq7rd3@J',
+    #     'NAME': 'biocomputing',
+    #     'OPTIONS': {
+    #         'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+    #         'charset': 'utf8mb4'
+    #     }
+    # }
 }
 
 

@@ -77,9 +77,9 @@ class Splicing:
 
         # TODO 钠离子浓度是多少？
 
-        # c_Na = 1.3 # mmol /
-
         c_Na = self.input_info['Na']  #
+        c_Na = 1.3  # mmol /
+        #
         c_K = self.input_info['K'] / 1000  #
         c_Mg = self.input_info['Mg'] / 1000  #
         c_dNTPs = self.input_info['dNTPs'] / 1000
@@ -292,7 +292,6 @@ class Splicing:
                         tem_std, _ = self.cal_all_tm(tem_index_list)
                         tem_result.append([tem_left, tem_right, tem_std])
 
-                # print(tem_result)
                 tem_result = self.choose(tem_result, count=1)
                 index_list[i] = tem_result[0, 0]
                 index_list[i + 1] = tem_result[0, 1]
@@ -306,8 +305,6 @@ class Splicing:
 
     def overlap(self, index_list, tm_list):
         # 动态规划
-        # print(index_list)
-        # index_list = index_list.astype(int)
         index_list = [int(i) for i in index_list]
         gene_list = []
         for i in range(len(tm_list)):  # 将gene截取出来存放在一个二维list中
@@ -366,13 +363,9 @@ class Splicing:
             test_tm_list = tm_list.copy()
             test_result = []
             for j in range(int(gene_list[a[i]][1] - gene_list[a[i] - 1][2])):
-                # print(gene_list[a[i] + 1][1], gene_list[a[i]][2], gene_list[a[i] + 1][1] - gene_list[a[i]][2])
                 for k in range(int(gene_list[a[i] + 1][1] - gene_list[a[i]][2])):
-                    # print(gene_list[a[i]][1], gene_list[a[i]][1] - j)
-                    # print(gene_list[a[i]][2], gene_list[a[i]][2] + k)
                     test_gene = self.gene[gene_list[a[i]][1] - j: gene_list[a[i]][2] + k]
                     test_tm = self.cal_tm(test_gene)
-                    # print(test_tm, gene_list[a[i]][4])
                     test_tm_list[a[i]] = test_tm
                     test_std = np.std(test_tm_list)
                     test_result.append([gene_list[a[i]][1] - j, gene_list[a[i]][2] + k, test_tm, test_std])
@@ -386,10 +379,6 @@ class Splicing:
             tm_list[a[i]] = test_result[0, 2]
 
         # show_w(index_list[1:], tm_list, "end")
-
-        # for i in range(len(gene_list) - 1):
-        #     print(gene_list[i + 1][1] - gene_list[i][2], end=" ")
-        # print()
         return gene_list
 
     def input_tail(self, tem_index, tem_tm):
@@ -414,7 +403,6 @@ class Splicing:
         self.gene = tem_gene
         self.gene_len = len(self.gene)
         self.tail = True
-        # print('tail')
         return tem_index, tem_tm
 
     def get_gene_list(self, index_list):
@@ -463,9 +451,6 @@ class Splicing:
             info.append([ind, tem_gene, tem_tm, overlap, len(tem_gene)])
 
         x1 = len(info)
-        # if info[-1][2] == -1:
-        #     del(info[-1])
-        # pass
 
         for i, tem_gene in enumerate(list_g2):  # 计算下面的单链
             ind = 'R{0}'.format(i)
@@ -496,7 +481,6 @@ class Splicing:
         len_g2 = len(list_g2)
         len_info = len(info)
         result = []
-        # print(len_g1, len_g2, x1, x2)
         for i in range(max(len_g1, len_g2)):
             if i < len_g1 - 1:
                 result.append(info[i])
@@ -529,19 +513,15 @@ class Splicing:
             'result': result
         }
         if self.tail:
-            # print('tail', self.gene_len, cut_of_index[-1][2])
             overlap_data['tail'] = self.gene[self.gene_len_sor: cut_of_index[-1][2]]
-            # print(overlap_data['tail'])
-
         return overlap_data
 
     def cal_mean_std(self, index):
-        # 根据一个切割位点list转化为[[i1, i1, i2, i2, tm], ...]的形式, 方便后面计算这种切割的overlap的tm
+        # 根据一个切割位点list转化为[[i1, i1, i2, i2, tm], [i2, i2, i3, i3, tm], ...]的形式, 方便后面计算这种切割的overlap的tm
         tem_res = []
         for i in range(1, len(index)):
             tem_gene = self.gene[int(index[i - 1]):int(index[i])]
             tem_res.append([int(index[i - 1]), int(index[i - 1]), int(index[i]), int(index[i]), self.cal_tm(tem_gene)])
-        # print(tem_res)
         return tem_res
 
     def return_result(self, index, tm):
@@ -552,17 +532,14 @@ class Splicing:
 
     def cal(self):
         index, tm = self.cal_next_tm()
-        show_each_gene_len(index)
         index, tm = self.cal_next_tm(np.mean(tm))
-        show_each_gene_len(index)
+
         # add tail
         if len(index) % 2 == 0:
             index, tm = self.input_tail(index, tm)
 
         index = np.insert(index, 0, [0])
-        show_each_gene_len(index)
         index, tm = self.iteration(index, tm)
-        show_each_gene_len(index)
 
         # Gap or Gapless
         cut_of_index = self.return_result(index, tm)
@@ -570,12 +547,16 @@ class Splicing:
         res1, res2 = self.get_gene_list(cut_of_index)
         info = self.get_more_info(res1, res2, cut_of_index)
 
+        # info for valification
         next_cal = [res1, res2, len(cut_of_index)]
-        # print(next_cal)
         return next_cal, info
 
+    def cal_pools(self):
 
-if __name__ == '__main__':
-    data = {'email': '758168660@qq.com', 'geneLen': 638, 'result': 'res1', 'minLen': 20, 'maxLen': 30, 'resultType': 'Gapless', 'verification': 'No', 'pools': 1, 'geneName': 'name', 'geneDesc': 'description', 'temperature': 37, 'concentrations': 1, 'gene': 'taagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacagttgcgcagcctgaataataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata', 'K': 50, 'Mg': 8, 'dNTPs': 4, 'Tris': 10, 'oligo': 10, 'primer': 400, 'Na': 1.2}
-    sp = Splicing(data)
-    sp.cal()
+        pass
+
+
+# if __name__ == '__main__':
+#     data = {'email': '758168660@qq.com', 'geneLen': 638, 'result': 'res1', 'minLen': 20, 'maxLen': 30, 'resultType': 'Gapless', 'verification': 'No', 'pools': 1, 'geneName': 'name', 'geneDesc': 'description', 'temperature': 37, 'concentrations': 1, 'gene': 'taagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacagttgcgcagcctgaataataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata', 'K': 50, 'Mg': 8, 'dNTPs': 4, 'Tris': 10, 'oligo': 10, 'primer': 400, 'Na': 1.2}
+#     sp = Splicing(data)
+#     sp.cal()

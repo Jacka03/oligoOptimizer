@@ -282,16 +282,7 @@
                                                      :cell-style="{padding:3+'px'}"
                                                      show-overflow-tooltip>
                                         <template slot-scope="scope">
-                                            {#TODO#}
-                                            {#{[ scope.row[j] ]}#}
-                                            {#<span v-if="">#}
-                                            {#    {[ scope.row[j] ]}#}
-                                            {#</span>     #}
-                                            {#<p v-html>#}
-                                            {#    {[ scope.row[j] ]}#}
-                                            {#</p>#}
                                             <span v-html="scope.row[j]"></span>
-
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -410,7 +401,7 @@
                             </div>
 
 
-                            <div v-if="dynamicValidateForm.pools == 1" style="padding: 30px" v-loading="another_res">
+                            <div style="padding: 30px" v-loading="another_res">
                                 <el-button
                                         style="margin-right: 70px; margin-left: 120px; "
                                         type="primary"
@@ -425,15 +416,6 @@
                                 </el-button>
                                 <el-button
                                         style="margin-right: 70px; margin-left: 50px; "
-                                        type="primary"
-                                        size="mini"
-                                        @click="download('res1')">download
-                                </el-button>
-
-                            </div>
-                            <div v-else>
-                                <el-button
-                                        style="margin-left: 235px; margin-top: 40px;"
                                         type="primary"
                                         size="mini"
                                         @click="download('res1')">download
@@ -582,7 +564,7 @@
                             </div>
 
 
-                            <div v-if="dynamicValidateForm.pools == 1" style="padding: 30px">
+                            <div style="padding: 30px">
                                 <el-button
                                         style="margin-right: 70px; margin-left: 120px; "
                                         type="primary"

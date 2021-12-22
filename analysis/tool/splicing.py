@@ -27,9 +27,9 @@ class Splicing:
 
     def __init__(self, input_info):
         self.input_info = input_info  # 各种离子信息
-        self.gene = input_info['gene'].upper()  # 基因序列
-        self.gene_len_sor = input_info['geneLen']  # 基因序列
-        self.gene_len = input_info['geneLen']  # 基因序列
+        self.gene = input_info['gene']  # 基因序列
+        self.gene_len_sor = len(self.gene)  # 基因序列
+        self.gene_len = len(self.gene)  # 基因序列
         self.res_type = input_info['resultType']  # 结果类型
         self.result = input_info['result']
 
@@ -77,7 +77,7 @@ class Splicing:
 
         # TODO 钠离子浓度是多少？
 
-        c_Na = self.input_info['Na']  #
+        # c_Na = self.input_info['Na']  #
         c_Na = 1.3  # mmol /
         #
         c_K = self.input_info['K'] / 1000  #
@@ -382,9 +382,12 @@ class Splicing:
         return gene_list
 
     def input_tail(self, tem_index, tem_tm):
-        tem_index = tem_index.tolist()
-        tem_tm = tem_tm.tolist()
-        str = "CAGTTCCTGAAGATAGATTAAGGCACCGTGATGAACGTATGCACAGCTT"
+        if not isinstance(tem_index, list):
+            tem_index = tem_index.tolist()
+        if not isinstance(tem_tm, list):
+            tem_tm = tem_tm.tolist()
+
+        str = "CAGTTCCTGAAGATAGATTAAGGCACCGTGATGAACGTATGCACAGCTTCCGAAGGTGAGCCAGTGTGACTCTAAACAGATAAAACGAAAG"
         tem_gene = self.gene + str
 
         tem_ans = []
@@ -396,6 +399,8 @@ class Splicing:
             end_std = np.std(tm_list)
             tem_ans.append([end_cut, end_tm, end_std])
 
+        # print(len(self.gene), self.gene_len, self.gene_len_sor, len(tem_gene))
+        # print(tem_ans)
         tem_res = self.choose(tem_ans, 1)
         tem_index.append(tem_res[0][0])
         tem_tm.append(tem_res[0][1])
@@ -513,6 +518,7 @@ class Splicing:
             'result': result
         }
         if self.tail:
+            # print(self.gene_len_sor, cut_of_index[-1][2])
             overlap_data['tail'] = self.gene[self.gene_len_sor: cut_of_index[-1][2]]
         return overlap_data
 
@@ -543,6 +549,7 @@ class Splicing:
 
         # Gap or Gapless
         cut_of_index = self.return_result(index, tm)
+        # print(cut_of_index)
 
         res1, res2 = self.get_gene_list(cut_of_index)
         info = self.get_more_info(res1, res2, cut_of_index)
@@ -551,9 +558,30 @@ class Splicing:
         next_cal = [res1, res2, len(cut_of_index)]
         return next_cal, info
 
-    def cal_pools(self):
+    def cal_for_pool(self):
+        _, tm = self.cal_next_tm()
+        index, tm = self.cal_next_tm(np.mean(tm))
+        index = [int(i) for i in index]
+        return index, tm  # TODO
 
-        pass
+    def cal_for_each_pool(self, index, tm):
+        # add tail
+        if len(index) % 2 == 0:
+            # print(len(index), index[-1])
+            index, tm = self.input_tail(index, tm)
+            # print(len(index), index[-1])
+
+        # 对整体遍历
+        index = np.insert(index, 0, [0])
+        index, tm = self.iteration(index, tm)
+
+        cut_of_index = self.return_result(index, tm)
+
+        res1, res2 = self.get_gene_list(cut_of_index)
+        info = self.get_more_info(res1, res2, cut_of_index)
+
+        next_cal = [res1, res2, len(cut_of_index)]
+        return next_cal, info
 
 
 # if __name__ == '__main__':

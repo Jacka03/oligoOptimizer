@@ -22,7 +22,7 @@ new Vue({
                 maxLen: 30,
                 resultType: 'Gap',
                 verification: 'No',
-                pools: 1,
+                pools: 2,
                 tableData: [
                     {
                         name: 'K',
@@ -89,6 +89,7 @@ new Vue({
 
         test(resArr) {
             // view tail
+
             source = resArr[resArr.length - 1];
             // {#TODO#}
             if (source.resInfo[5] != undefined) {
@@ -161,6 +162,7 @@ new Vue({
                 document.body.removeChild(elink);
 
             }).catch(function (error) {
+                alert(error);
                 console.log(error);
             });
         },
@@ -169,7 +171,8 @@ new Vue({
             this.dynamicValidateForm.email = '758168660@qq.com';
             this.dynamicValidateForm.geneDesc = 'description';
             this.dynamicValidateForm.geneName = 'name';
-            this.dynamicValidateForm.gene = 'taagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacagttgcgcagcctgaataataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata';
+            // this.dynamicValidateForm.gene = 'taagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacagttgcgcagcctgaataataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata';
+            this.dynamicValidateForm.gene = 'taagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggtaagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacataagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccggttgcgcagcctgaataataacgctaagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttat';
             this.dynamicValidateForm.geneLen = this.dynamicValidateForm.gene.length;
         },
 
@@ -212,9 +215,10 @@ new Vue({
             that.arr = [];
             that.anotherArr = [];
 
-            if (that.dynamicValidateForm.pools === 1) {
+            if (that.dynamicValidateForm.pools == 1) {
                 axios.post("/assembly/", formData).then(function (response) {
                     that.arr = response.data.arr;
+                    console.log(that.arr)
                     that.arr = that.test(that.arr)
 
                     that.activeName = 'output1';
@@ -228,10 +232,10 @@ new Vue({
                     that.loading = false;
                 });
 
-
             } else {
                 axios.post("/assemblyPools/", formData).then(function (response) {
                     that.arr = response.data.arr;
+                    console.log(that.arr)
                     that.arr = that.test(that.arr)
 
                     that.activeName = 'output1';
@@ -240,6 +244,8 @@ new Vue({
 
                 }).catch(function (error) {
                     console.log(error);
+                    alert(error);
+                    that.loading = false;
                 });
             }
         },
@@ -277,21 +283,41 @@ new Vue({
                 var that = this;
                 formData.result = 'res2';
                 that.another_res = true;
-                axios.post("/assembly/", formData).then(function (response) {
-                    that.anotherArr = response.data.arr;
-                    that.anotherArr = that.test(that.anotherArr)
 
-                    // console.log(that.anotherArr)
-                    that.activeName = 'output2';
-                    that.output2 = true;
-                    that.loading = false;
-                    that.another_res = false;
-                }).catch(function (error) {
-                    // console.log(error);
-                    alert(error);
-                    that.loading = false;
-                    that.another_res = false;
-                });
+                if (that.dynamicValidateForm.pools === 1) {
+                    axios.post("/assembly/", formData).then(function (response) {
+                        that.anotherArr = response.data.arr;
+                        that.anotherArr = that.test(that.anotherArr)
+
+                        // console.log(that.anotherArr)
+                        that.activeName = 'output2';
+                        that.output2 = true;
+                        that.loading = false;
+                        that.another_res = false;
+                    }).catch(function (error) {
+                        // console.log(error);
+                        alert(error);
+                        that.loading = false;
+                        that.another_res = false;
+                    });
+                } else {
+                    axios.post("/assemblyPools/", formData).then(function (response) {
+                        that.anotherArr = response.data.arr;
+                        console.log(that.anotherArr);
+
+                        that.anotherArr = that.test(that.anotherArr);
+
+                        that.activeName = 'output2';
+                        that.output2 = true;
+                        that.loading = false;
+                        that.another_res = false;
+
+                    }).catch(function (error) {
+                        console.log(error);
+                        alert(error);
+                        that.loading = false;
+                    });
+                }
             }
         },
 

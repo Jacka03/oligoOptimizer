@@ -8,92 +8,29 @@ from django.views import View
 
 from analysis import models
 from analysis.tool.splicing import Splicing
+from analysis.tool.utils import is_dna, reverse_comple, preprocessing_data, get_res_info
 
 
 class AssemblyView(View):
-    def get_tableData(self, data_list):
-        tableData = {}
-        for data in data_list:
-            tableData[data['name']] = data['data']
-
-        tableData['Na'] = 1.2
-        return tableData
 
     def get(self, request):
         return render(request, 'assembly.html')
 
-    def get_res_info(self, info):
-        # list -> dict
-        res_info = {
-            'min': info.get('min'),
-            'max': info.get('max'),
-            'range': info.get('range'),
-            'mean': info.get('mean'),
-            'std': info.get('std')
-        }
-
-        if info.get('tail'):
-            res_info['tail'] = info.get('tail')
-
-        tem_res = []
-        for key, value in res_info.items():
-            tem = {
-                'key': key,
-                'value': value,
-            }
-            tem_res.append(tem)
-        return tem_res
-
-    # 获取反向序列
-    def reverse_comple(self, seq):
-        seq = seq[::-1]
-        dnaTable = {
-            "A": "T", "T": "A", "C": "G", "G": "C"
-        }
-        res = ""
-        for ele in seq:
-            if ele in seq:
-                res += dnaTable[ele]
-        return res
-
-    def is_dna(self, seq):
-        table = ['A', 'T', 'C', 'G']
-        for ele in seq:
-            if ele not in table:
-                raise Exception("gene error")
-
-    def preprocessing_data(self, data):
-        ion = data.pop('tableData')
-        ion = self.get_tableData(ion)
-        # add ion to data (dits)
-        data.update(ion)
-        data['gene'] = data['gene'].replace('\n', '').replace(' ', '').replace('\r', '').upper()
-
-        self.is_dna(data['gene'])
-
-        if data['result'] == 'res2':
-            print('res2')
-            data['gene'] = self.reverse_comple(data['gene'])
-
-        return data
-
     def post(self, request):
         try:
             data = json.loads(request.body)
-            data = self.preprocessing_data(data)
-
-            # print(data)
+            data = preprocessing_data(data)
 
             # add to db
             # models.GeneInfo.objects.create(email=data['email'], gene_len=data['geneLen'],
             #                                pools=data['pools'], min_len=data['minLen'], max_len=data['maxLen'])
-            # print(data)
+
             splic = Splicing(data)
             next_cal, info = splic.cal()
 
             # add cal info to context
-            tem_res = self.get_res_info(info)
-
+            tem_res = get_res_info(info)
+            # return info
             context = {
                 'info': info.get('result'),
                 'resInfo': tem_res,
@@ -119,8 +56,68 @@ class AssemblyView(View):
             arr = [context]
             context = {'arr': arr}
         except Exception as err:
-            # print(err)
             # raise Http404('genenenenen')
             return JsonResponse({"error": err})
+
+        return JsonResponse(context)
+
+
+class AssemblyPoolsView(View):
+
+    def post(self, request):
+        # try:
+        data = json.loads(request.body)
+        data = preprocessing_data(data)
+
+        pools = int(data['pools'])
+        # print("pools:{0}".format(pools))
+        splic = Splicing(data)
+        index, tm = splic.cal_for_pool()
+
+        # overlap of each pool
+        each_pool = int(len(index) / pools)
+        each_pool = each_pool + 1 if each_pool % 2 == 0 else each_pool
+        # print("after pools:{0}".format(each_pool))
+
+        gene = data['gene']
+        # print("gene:{0}".format(len(gene)))
+        arr = []
+        for i in range(pools):
+            if i == 0:
+                index_list = index[i * each_pool: (i + 1) * each_pool]
+                gene_list = gene[0: index_list[-1]]
+                tm_list = tm[i * each_pool: (i + 1) * each_pool]
+            elif i == pools - 1:
+                index_list = index[(pools - 1) * each_pool: -1]
+                gene_list = gene[index[(pools - 1) * each_pool - 1]: len(gene)]
+                index_list = [x - index[(pools - 1) * each_pool - 1] for x in index_list]
+                tm_list = tm[(pools - 1) * each_pool: -1]
+            elif i > 0:
+                index_list = index[i * each_pool: (i + 1) * each_pool]
+                gene_list = gene[index[i * each_pool - 1]: index_list[-1]]
+                index_list = [x - index[i * each_pool - 1] for x in index_list]
+                tm_list = tm[i * each_pool: (i + 1) * each_pool]
+
+            data['gene'] = gene_list
+
+            splic = Splicing(data)
+            # print(len(index_list))
+            next_cal, info = splic.cal_for_each_pool(index_list, tm_list)
+
+            tem_res = get_res_info(info)
+
+            context = {
+                'info': info.get('result'),
+                'resInfo': tem_res,
+                'nextCal': next_cal,
+                'temperature': data['temperature'],
+                'concentrations': data['concentrations']
+            }
+            arr.append(context)
+
+        context = {'arr': arr}
+        # except Exception as e:
+        #     print("error")
+        #     context = {'error': 'error'}
 
         return JsonResponse(context)

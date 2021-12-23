@@ -1,7 +1,10 @@
 import json
 import time
+import io
 
-from django.http import JsonResponse, Http404
+import pandas as pd
+
+from django.http import JsonResponse, Http404, HttpResponse
 from django.shortcuts import render
 
 # Create your views here.
@@ -154,3 +157,52 @@ class AnalysisView(View):
         context['analyInfo'] = analy_info_list
 
         return JsonResponse(context)
+
+
+
+class DownloadView(View):  # 导出excel数据
+    def get(self, request):
+        # print("test success")
+        return HttpResponse("get")
+
+    # 将dataform转换成django-excel下载是的sheet
+    def post(self, request):
+        tem = json.loads(request.body)
+        output = io.BytesIO()  # 配置一个BytesIO 这个是为了转二进制流
+        count = 0
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            for i in range(len(tem)):
+                # pool
+                data = pd.DataFrame(data=['pool:{0}'.format(i + 1)])
+                data.to_excel(writer, startrow=count, index=False, header=None)
+                count += 1
+
+                # analysis result
+                res_info = tem[i]['resInfo']
+                data = pd.DataFrame(data=res_info)
+                data.to_excel(writer, startrow=count, startcol=6, index=False)
+
+                if 'analyInfo' in tem[i]:
+                    # analysis result
+                    analy_info = tem[i]['analyInfo']
+                    data = pd.DataFrame(data=analy_info)
+                    data.to_excel(writer, startrow=count, startcol=9, index=False)
+
+                # result
+                info = tem[i]['info']
+                data = pd.DataFrame(data=info, columns=['index', 'gene', 'tm', 'overlap', 'length'])
+                data.to_excel(writer, startrow=count, index=False)
+                count += data.shape[0] + 2
+
+        # data.to_excel(output, index=False)  # index=False 是为了不建立索引
+        # append_df_to_excel(data, output, sheet_name='Sheet1', startcol=10,startrow=0,index=False)
+        output.seek(0)  # 把游标归0
+
+        response = HttpResponse()  # 创建一个HttpResponse
+        # response["Content-Type"] = "application/vnd.ms-excel"  # 类型
+        file_name = 'comment.xlsx'  # 文件名称 自定义
+        response['Content-Type'] = 'application/octet-stream'
+        response['Content-Disposition'] = 'attachment;filename="{0}"'.format(file_name)
+        response.write(output.getvalue())  # 写入数据
+        output.close()  # 关闭
+        return response  # 返回

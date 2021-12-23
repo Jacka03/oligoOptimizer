@@ -22,6 +22,8 @@ class Verification:
         self.second_check = 1e-14  # 第二次验证时的浓度
         self.temp = temp  # 验证 时的温度
 
+        self.n = 8000
+
     def get_strands_tube_tow(self):
         # 获取试管中只有两条基因片段的所有情况
         tubes = []
@@ -53,13 +55,21 @@ class Verification:
     def analysis_two(self):
         my_model = Model(material='dna', celsius=self.temp)  # 温度
         tubes = self.get_strands_tube_tow()  # 得到每个试管中都有两条DNA单链
-        start = time.time()
-        tube_results = tube_analysis(tubes=tubes, model=my_model)
-        print("analysis time:{0}".format(time.time() - start))
+        # start = time.time()
+        # tube_results = tube_analysis(tubes=tubes, model=my_model)
+        # print("analysis time:{0}".format(time.time() - start))
         all_conc = {}
-        for t in tubes:
-            for my_complex, conc in tube_results.tubes[t].complex_concentrations.items():
-                all_conc[my_complex.name] = conc  # 反应后每个试管中DNA的浓度
+        tubes_list = [tubes[i:i + self.n] for i in range(0, len(tubes), self.n)]
+        for i in tubes_list:
+            tube_results = tube_analysis(tubes=i, model=my_model)
+            for t in i:
+                for my_complex, conc in tube_results.tubes[t].complex_concentrations.items():
+                    all_conc[my_complex.name] = conc  # 反应后每个试管中DNA的浓度
+
+        # all_conc = {}
+        # for t in tubes:
+        #     for my_complex, conc in tube_results.tubes[t].complex_concentrations.items():
+        #         all_conc[my_complex.name] = conc  # 反应后每个试管中DNA的浓度
         all_conc = sorted(all_conc.items(), key=lambda d: d[1], reverse=True)  # 排序
 
         error = {}  # 怀疑是错配的
@@ -130,13 +140,23 @@ class Verification:
     def analysis_three(self):
         my_model = Model(material='dna', celsius=self.temp)
         tubes = self.get_strands_tube_three()  # 得到每个试管中都有两条DNA单链
-        tube_results = tube_analysis(tubes=tubes, model=my_model)
+        start = time.time()
+        # 放在一个池时间复杂度太高了
+        # tube_results = tube_analysis(tubes=tubes, model=my_model)
 
+        all_conc = {}
+        tubes_list = [tubes[i:i + self.n] for i in range(0, len(tubes), self.n)]
+        for i in tubes_list:
+            tube_results = tube_analysis(tubes=i, model=my_model)
+            for t in i:
+                for my_complex, conc in tube_results.tubes[t].complex_concentrations.items():
+                    all_conc[my_complex.name] = conc  # 反应后每个试管中DNA的浓度
 
-        all_conc = {}  # 记录结果
-        for t in tubes:
-            for my_complex, conc in tube_results.tubes[t].complex_concentrations.items():
-                all_conc[my_complex.name] = conc  # 反应后每个试管中DNA的浓度
+        print("n = {0}, analysis time:{1}, {2}".format(self.n, time.time() - start, len(all_conc)))
+        # all_conc = {}  # 记录结果
+        # for t in tubes:
+        #     for my_complex, conc in tube_results.tubes[t].complex_concentrations.items():
+        #         all_conc[my_complex.name] = conc  # 反应后每个试管中DNA的浓度
         all_conc = sorted(all_conc.items(), key=lambda d: d[1], reverse=True)  # 排序
 
         error = {}  # 怀疑是错配的
@@ -190,20 +210,20 @@ class Verification:
 
 
 
-if __name__ == '__main__':
-
-    data1 = ['TAAGCACCTGTAGGATCGTACAGGTTTACGCAAGAAAATGGTTTGTT', 'ATAGTCGAATAACACCGTGCGTGTTGACTATTTTACCTCTGGCGG', 'TGATATACTAGAGAAAGAGGAGAAATACTAGATGACCATGATTACGCCAAGCG', 'CGCAATTAACCCTCACTAAAGGGAACAAAAGCTGGAGCTCCACCG', 'CGGTGGCGGCAGCACTAGAGCTAGTGGATCCCCCGG', 'GCTGTAGAAATTCGATATCAAGCTTATCGATACCGTCGACCTCGAGGGG', 'GGGCCCGGTACCCAATTCGCCCTATAGTGAGTCGTATTACGCG', 'CGCTCACTGGCCGTCGTTTTACAACGTCGTGACTGGGAAAACC', 'TGGCGTTACCCAACTTAATCGCCTTGCAGCACATCCCCCTTTC', 'GCCAGCTGGCGTAATAGCGAAGAGGCCCGCACCGATCG', 'CCCTTCCCAACAGTTGCGCAGCCTGAATAATAACGCTGATAGTGCTA', 'TGTAGATCGCTACTAGAGCCAGGCATCAAATAAAACGAAAGGCTCAGTCG', 'AGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTC', 'CTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGT', 'TTATACAGTTCCTGAAGATAGATTAAGGCAC']
-
-    data2 = ['TGTACGATCCTACAGGTGCTTA', 'ACGCACGGTGTTATTCGACTATAACAAACCATTTTCTTGCGTAAACC', 'TCTAGTATTTCTCCTCTTTCTCTAGTATATCACCGCCAGAGGTAAAATAGTCAAC', 'TTCCCTTTAGTGAGGGTTAATTGCGCGCTTGGCGTAATCATGGTCA', 'AGTGCTGCCGCCACCGCGGTGGAGCTCCAGCTTTTG', 'CGATAAGCTTGATATCGAATTTCTACAGCCCGGGGGATCCACTAGCTC', 'CGAATTGGGTACCGGGCCCCCCCTCGAGGTCGACGGTA', 'ACGACGGCCAGTGAGCGCGCGTAATACGACTCACTATAGGG', 'GCGATTAAGTTGGGTAACGCCAGGGTTTTCCCAGTCACGACGTTG', 'CGCTATTACGCCAGCTGGCGAAAGGGGGATGTGCTGCAAG', 'GCGCAACTGTTGGGAAGGGCGATCGGTGCGGGCCT', 'CCTGGCTCTAGTAGCGATCTACACTAGCACTATCAGCGTTATTATTCAGGC', 'CAGATAAAACGAAAGGCCCAGTCTTTCGACTGAGCCTTTCGTTTTATTTGAT', 'AGGTGAGCCAGTGTGACTCTAGTAGAGAGCGTTCACCGACAAACAA', 'GTGCCTTAATCTATCTTCAGGAACTGTATAAACGCAGAAAGGCCCACCC']
-    data3 = 29
-    data4 = 37
-    data5 = 1e-8
-
-    veri = Verification(data1, data2[1:], data3, data4, data5)
-    ver_info = veri.analysis_two()
-    print(len(ver_info), ver_info)
-
-    ver_info1 = veri.analysis_three()
-    print(len(ver_info1), ver_info1)
+# if __name__ == '__main__':
+#
+#     data1 = ['TAAGCACCTGTAGGATCGTACAGGTTTACGCAAGAAAATGGTTTGTT', 'ATAGTCGAATAACACCGTGCGTGTTGACTATTTTACCTCTGGCGG', 'TGATATACTAGAGAAAGAGGAGAAATACTAGATGACCATGATTACGCCAAGCG', 'CGCAATTAACCCTCACTAAAGGGAACAAAAGCTGGAGCTCCACCG', 'CGGTGGCGGCAGCACTAGAGCTAGTGGATCCCCCGG', 'GCTGTAGAAATTCGATATCAAGCTTATCGATACCGTCGACCTCGAGGGG', 'GGGCCCGGTACCCAATTCGCCCTATAGTGAGTCGTATTACGCG', 'CGCTCACTGGCCGTCGTTTTACAACGTCGTGACTGGGAAAACC', 'TGGCGTTACCCAACTTAATCGCCTTGCAGCACATCCCCCTTTC', 'GCCAGCTGGCGTAATAGCGAAGAGGCCCGCACCGATCG', 'CCCTTCCCAACAGTTGCGCAGCCTGAATAATAACGCTGATAGTGCTA', 'TGTAGATCGCTACTAGAGCCAGGCATCAAATAAAACGAAAGGCTCAGTCG', 'AGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTC', 'CTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGT', 'TTATACAGTTCCTGAAGATAGATTAAGGCAC']
+#
+#     data2 = ['TGTACGATCCTACAGGTGCTTA', 'ACGCACGGTGTTATTCGACTATAACAAACCATTTTCTTGCGTAAACC', 'TCTAGTATTTCTCCTCTTTCTCTAGTATATCACCGCCAGAGGTAAAATAGTCAAC', 'TTCCCTTTAGTGAGGGTTAATTGCGCGCTTGGCGTAATCATGGTCA', 'AGTGCTGCCGCCACCGCGGTGGAGCTCCAGCTTTTG', 'CGATAAGCTTGATATCGAATTTCTACAGCCCGGGGGATCCACTAGCTC', 'CGAATTGGGTACCGGGCCCCCCCTCGAGGTCGACGGTA', 'ACGACGGCCAGTGAGCGCGCGTAATACGACTCACTATAGGG', 'GCGATTAAGTTGGGTAACGCCAGGGTTTTCCCAGTCACGACGTTG', 'CGCTATTACGCCAGCTGGCGAAAGGGGGATGTGCTGCAAG', 'GCGCAACTGTTGGGAAGGGCGATCGGTGCGGGCCT', 'CCTGGCTCTAGTAGCGATCTACACTAGCACTATCAGCGTTATTATTCAGGC', 'CAGATAAAACGAAAGGCCCAGTCTTTCGACTGAGCCTTTCGTTTTATTTGAT', 'AGGTGAGCCAGTGTGACTCTAGTAGAGAGCGTTCACCGACAAACAA', 'GTGCCTTAATCTATCTTCAGGAACTGTATAAACGCAGAAAGGCCCACCC']
+#     data3 = 29
+#     data4 = 37
+#     data5 = 1e-8
+#
+#     veri = Verification(data1, data2[1:], data3, data4, data5)
+#     ver_info = veri.analysis_two()
+#     print(len(ver_info), ver_info)
+#
+#     ver_info1 = veri.analysis_three()
+#     print(len(ver_info1), ver_info1)
 
 

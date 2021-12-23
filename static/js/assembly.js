@@ -8,7 +8,7 @@ new Vue({
 
             showTable: true,
             loading: false,
-            valificationLoading: false,
+            verificationLoading: false,
             another_res: false,
 
             activeIndex: 'second',
@@ -225,7 +225,6 @@ new Vue({
                     that.activeName = 'output1';
                     that.output1 = true;
                     that.loading = false;
-
                 }).catch(function (error) {
                     // console.log(error);
                     alert(error);
@@ -251,20 +250,24 @@ new Vue({
             }
         },
 
-        validation(index, nextCal, tem, concentrations) {
+        validation(index, nextCal, tem, concentrations, res) {
             var that = this;
             nextCal.push(tem);
             nextCal.push(concentrations);
 
-            that.valificationLoading = true;
+            that.verificationLoading = true;
             that.loading = true;
             axios.post("/analysis/", nextCal).then(function (response) {
-                that.arr[index]["analyInfo"] = response.data.analyInfo;
+                if(res == 'res1') {
+                    that.arr[index]["analyInfo"] = response.data.analyInfo;
+                } else if(res == 'res2') {
+                    that.anotherArr[index]["analyInfo"] = response.data.analyInfo;
+                }
 
                 that.dynamicValidateForm.pools = 1;
                 that.$nextTick(() => that.dynamicValidateForm.pools = 2);
 
-                that.valificationLoading = false;
+                that.verificationLoading = false;
                 that.loading = false;
 
             }).catch(function (error) {

@@ -355,10 +355,9 @@
                                         v-if="dynamicValidateForm.pools > 1
                                         && dynamicValidateForm.verification == 'Yes'
                                         && item_i.analyInfo == null"
-                                        v-loading="valificationLoading"
+                                        v-loading="verificationLoading"
                                 >
                                     <el-form>
-
                                         <el-form-item
                                                 size="small"
                                                 style="margin-left: 0px; ">
@@ -391,7 +390,7 @@
                                         <el-button type="primary"
                                                    size="mini"
                                                    style="margin-left: 235px"
-                                                   @click="validation(i, item_i.nextCal, item_i.temperature, item_i.concentrations)">
+                                                   @click="validation(i, item_i.nextCal, item_i.temperature, item_i.concentrations, 'res1')">
 
                                             Validation
                                         </el-button>
@@ -519,7 +518,8 @@
                                         style="margin-left: 100px; margin-top: 40px;"
                                         v-if="dynamicValidateForm.pools > 1
                                         && dynamicValidateForm.verification == 'Yes'
-                                        && item_i.analyInfo == null">
+                                        && item_i.analyInfo == null"
+                                        v-loading="verificationLoading">
                                     <el-form>
 
                                         <el-form-item
@@ -550,11 +550,10 @@
                                             </el-col>
                                         </el-form-item>
 
-
                                         <el-button type="primary"
                                                    size="mini"
                                                    style="margin-left: 235px"
-                                                   @click="validation(i, item_i.nextCal, item_i.temperature, item_i.concentrations)">
+                                                   @click="validation(i, item_i.nextCal, item_i.temperature, item_i.concentrations, 'res2')">
 
                                             Validation
                                         </el-button>

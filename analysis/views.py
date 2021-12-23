@@ -1,4 +1,5 @@
 import json
+import time
 
 from django.http import JsonResponse, Http404
 from django.shortcuts import render
@@ -9,6 +10,7 @@ from django.views import View
 from analysis import models
 from analysis.tool.splicing import Splicing
 from analysis.tool.utils import is_dna, reverse_comple, preprocessing_data, get_res_info
+from analysis.tool.verification import Verification
 
 
 class AssemblyView(View):
@@ -37,21 +39,25 @@ class AssemblyView(View):
                 'nextCal': next_cal
             }
             # print(context)
-            # if data.get('verification') == 'Yes':
-            #
-            #     conc = data['concentrations'] * 1e-8
-            #     # 分析过程
-            #     analy = Analysis(next_cal[0], next_cal[1][1:], next_cal[2], data['temperature'], conc)
-            #     analy_info = analy.analysis_two()
-            #     analy_info.update(analy.analysis_three())
-            #
-            #     analy_info_list = []
-            #     for key, value in analy_info.items():
-            #         analy_info_list.append({
-            #             'key': key,
-            #             'value': value,
-            #         })
-            #     context['analyInfo'] = analy_info_list
+            if data.get('verification') == 'Yes':
+                conc = data['concentrations'] * 1e-8
+                # 分析过程
+                analy = Verification(next_cal[0], next_cal[1][1:], next_cal[2], data['temperature'], conc)
+                start = time.time()
+                analy_info = analy.analysis_two()
+                mid = time.time()
+                analy_info.update(analy.analysis_three())
+                end = time.time()
+
+                print("two:{0}, three:{1}".format(mid-start, end-mid))
+
+                analy_info_list = []
+                for key, value in analy_info.items():
+                    analy_info_list.append({
+                        'key': key,
+                        'value': value,
+                    })
+                context['analyInfo'] = analy_info_list
 
             arr = [context]
             context = {'arr': arr}
@@ -119,5 +125,32 @@ class AssemblyPoolsView(View):
         # except Exception as e:
         #     print("error")
         #     context = {'error': 'error'}
+
+        return JsonResponse(context)
+
+
+class AnalysisView(View):
+
+    def get(self, request):
+        return render(request, 'assembly.html')
+
+    def post(self, request):
+        next_cal = json.loads(request.body)
+        # next_cal = data['nextCal']
+        # 分析过程
+        temp = next_cal[4] * 1e-8
+        # print(temp)
+        analy = Verification(next_cal[0], next_cal[1][1:], next_cal[2], next_cal[3], temp)
+        analy_info = analy.analysis_two()
+
+        analy_info.update(analy.analysis_three())
+        analy_info_list = []
+        context = {}
+        for key, value in analy_info.items():
+            analy_info_list.append({
+                'key': key,
+                'value': value,
+            })
+        context['analyInfo'] = analy_info_list
 
         return JsonResponse(context)

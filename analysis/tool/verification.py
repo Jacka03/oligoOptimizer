@@ -22,12 +22,12 @@ class Verification:
         self.second_check = 1e-14  # 第二次验证时的浓度
         self.temp = temp  # 验证 时的温度
 
-        self.n = 8000
+        self.n = 8000  # 每次进行运算的tube个数
 
     def get_strands_tube_tow(self):
         # 获取试管中只有两条基因片段的所有情况
         tubes = []
-        count = 1
+        count = 1  # 记录tube个数
         for i in range(self.len_gene):
             for j in range(i, self.len_gene):
                 strands = {Strand(self.gene_list[i], name="t{0}:L{1}".format(count, i)): self.c_gene,
@@ -59,6 +59,7 @@ class Verification:
         # tube_results = tube_analysis(tubes=tubes, model=my_model)
         # print("analysis time:{0}".format(time.time() - start))
         all_conc = {}
+
         tubes_list = [tubes[i:i + self.n] for i in range(0, len(tubes), self.n)]
         for i in tubes_list:
             tube_results = tube_analysis(tubes=i, model=my_model)
@@ -145,6 +146,7 @@ class Verification:
         # tube_results = tube_analysis(tubes=tubes, model=my_model)
 
         all_conc = {}
+        # 将包含上万个tube的list分割成多个包含self.n个tube的二维list
         tubes_list = [tubes[i:i + self.n] for i in range(0, len(tubes), self.n)]
         for i in tubes_list:
             tube_results = tube_analysis(tubes=i, model=my_model)
@@ -160,11 +162,11 @@ class Verification:
         all_conc = sorted(all_conc.items(), key=lambda d: d[1], reverse=True)  # 排序
 
         error = {}  # 怀疑是错配的
-        k_cou = 0  # 记录浓度大于某个值的
+        # k_cou = 0  # 记录浓度大于某个值的
 
         for k, v in all_conc:
             if k.count("+") == 2 and v > self.first_check:  # 将浓度换成输入的浓度
-                k_cou += 1
+                # k_cou += 1
                 # 根据：分割k， 然后根据名字具有顺序关系，然后确定是不是正确的配对
                 tem_split = k.split('+')
                 t1 = int(tem_split[0].split(':')[1][1:])
@@ -191,7 +193,7 @@ class Verification:
                 break
 
         # second check
-        error_end = []  # 经过校验后还是错配的
+        # error_end = []  # 经过校验后还是错配的
 
         # 添加验证
         # print("验证:{0},{1},{2}".format(t1, t2, t3))

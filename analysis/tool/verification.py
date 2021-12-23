@@ -53,12 +53,13 @@ class Verification:
     def analysis_two(self):
         my_model = Model(material='dna', celsius=self.temp)  # 温度
         tubes = self.get_strands_tube_tow()  # 得到每个试管中都有两条DNA单链
+        start = time.time()
         tube_results = tube_analysis(tubes=tubes, model=my_model)
+        print("analysis time:{0}".format(time.time() - start))
         all_conc = {}
         for t in tubes:
             for my_complex, conc in tube_results.tubes[t].complex_concentrations.items():
                 all_conc[my_complex.name] = conc  # 反应后每个试管中DNA的浓度
-
         all_conc = sorted(all_conc.items(), key=lambda d: d[1], reverse=True)  # 排序
 
         error = {}  # 怀疑是错配的
@@ -112,17 +113,97 @@ class Verification:
         # print('总数{0}'.format(len(all_conc)))
         return tem_info
 
+    def get_strands_tube_three(self):
+        tubes = []
+        count = 1  # 记录试管数目
+        for i in range(self.len_gene):
+            for j in range(i, self.len_gene):
+                for k in range(j, self.len_gene):
+                    strands = {Strand(self.gene_list[i], name="t{0}:L{1}".format(count, i)): self.c_gene,
+                               Strand(self.gene_list[j], name="t{0}:M{1}".format(count, j)): self.c_gene,
+                               Strand(self.gene_list[k], name="t{0}:R{1}".format(count, k)): self.c_gene}
+                    tubes.append(Tube(strands=strands, complexes=SetSpec(max_size=3),  # max_size,使用变量代替？
+                                      name='t{0}'.format(count)))  # complexes defaults to [A, B]
+                    count += 1
+        return tubes
+
+    def analysis_three(self):
+        my_model = Model(material='dna', celsius=self.temp)
+        tubes = self.get_strands_tube_three()  # 得到每个试管中都有两条DNA单链
+        tube_results = tube_analysis(tubes=tubes, model=my_model)
+
+
+        all_conc = {}  # 记录结果
+        for t in tubes:
+            for my_complex, conc in tube_results.tubes[t].complex_concentrations.items():
+                all_conc[my_complex.name] = conc  # 反应后每个试管中DNA的浓度
+        all_conc = sorted(all_conc.items(), key=lambda d: d[1], reverse=True)  # 排序
+
+        error = {}  # 怀疑是错配的
+        k_cou = 0  # 记录浓度大于某个值的
+
+        for k, v in all_conc:
+            if k.count("+") == 2 and v > self.first_check:  # 将浓度换成输入的浓度
+                k_cou += 1
+                # 根据：分割k， 然后根据名字具有顺序关系，然后确定是不是正确的配对
+                tem_split = k.split('+')
+                t1 = int(tem_split[0].split(':')[1][1:])
+                t2 = int(tem_split[1].split(':')[1][1:])
+                t3 = int(tem_split[2].split(':')[1][1:-1])
+                set_t = {abs(t1 - t2), abs(t1 - t3), abs(t2 - t3)}
+
+                if set_t != {1, self.len_g1, self.len_g1 - 1}:
+                    tem_arr = [t1, t2, t3]
+                    tem_arr.sort()
+                    key = ''
+                    for i in tem_arr:
+                        if i >= self.len_g1:
+                            key = key + 'R{0},'.format(i - self.len_g1)
+                        else:
+                            key = key + 'F{0},'.format(i)
+                    key = key[:-1]
+                    if key in error and v < error[key]:
+                        continue
+                    else:
+                        error[key] = v
+
+            elif v < self.first_check:  #
+                break
+
+        # second check
+        error_end = []  # 经过校验后还是错配的
+
+        # 添加验证
+        # print("验证:{0},{1},{2}".format(t1, t2, t3))
+        # tem_err_list = self.get_tube(t1)
+        # tem_err_list.extend(self.get_tube(t2))
+        # tem_err_list.extend(self.get_tube(t3))
+        # if self.verification_two(tem_err_list):
+        #     error_end.append(k)
+
+        # print("目标:{0},list1:{1},list2:{2}".format(int(self.len1 / 2), self.len_g1, self.len_g2))
+        # print("出错的:{0},{1}".format(len(error), error))
+        # print("最终检测还是出错的{0}".format(error_end))
+        # print("浓度大于1e-9数:{0}".format(k_cou))
+        # print('总数:{0}'.format(len(all_conc)))
+        return error
+
+
 
 if __name__ == '__main__':
 
-    data1 = ['AGCACCTGTAGGATCGTACAGGTTTACGCAAGAAAATGGTTTGTTATAGTCGA', 'ATAACACCGTGCGTGTTGACTATTTTACCTCTGGCGGTGATATACTAGAGA', 'AAGAGGAGAAATACTAGATGACCATGATTACGCCAAGCGCGCAATTAAC', 'CCTCACTAAAGGGAACAAAAGCTGGAGCTCCACCGCGGTGGC', 'GGCAGCACTAGAGCTAGTGGATCCCCCGGGCTGTAGAAATTCGATAT', 'CAAGCTTATCGATACCGTCGACCTCGAGGGGGGGCCCGG', 'ACCCAATTCGCCCTATAGTGAGTCGTATTACGCGCGCTCACTGGC', 'CGTCGTTTTACAACGTCGTGACTGGGAAAACCCTGGCGTTACCCA', 'CTTAATCGCCTTGCAGCACATCCCCCTTTCGCCAGCTGGCG', 'GCGAAGAGGCCCGCACCGATCGCCCTTCCCAACAGTTGC', 'GCAGCCTGAATAATAACGCTGATAGTGCTAGTGTAGATCGCTACTAGAGCCAG', 'GCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATCTG', 'TTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTC', 'GGGTGGGCCTTTCTGCGTT']
-    data2 = ['AAAATAGTCAACACGCACGGTGTTATTCGACTATAACAAACCATTTTCTTGCGTAA', 'AATCATGGTCATCTAGTATTTCTCCTCTTTCTCTAGTATATCACCGCCAGAGGT', 'CCAGCTTTTGTTCCCTTTAGTGAGGGTTAATTGCGCGCTTGGCGT', 'GATCCACTAGCTCTAGTGCTGCCGCCACCGCGGTGGAGC', 'AGGTCGACGGTATCGATAAGCTTGATATCGAATTTCTACAGCCCGGGG', 'GACTCACTATAGGGCGAATTGGGTACCGGGCCCCCCCTCG', 'CAGTCACGACGTTGTAAAACGACGGCCAGTGAGCGCGCGTAA', 'GGATGTGCTGCAAGGCGATTAAGTTGGGTAACGCCAGGGTTTTCC', 'GGTGCGGGCCTCTTCGCTATTACGCCAGCTGGCGAAAGGG', 'CACTATCAGCGTTATTATTCAGGCTGCGCAACTGTTGGGAAGGGCGA', 'GACTGAGCCTTTCGTTTTATTTGATGCCTGGCTCTAGTAGCGATCTACACTAG', 'AGAGAGCGTTCACCGACAAACAACAGATAAAACGAAAGGCCCAGTCTTT', 'AACGCAGAAAGGCCCACCCGAAGGTGAGCCAGTGTGACTCTAG']
-    data3 = 27
+    data1 = ['TAAGCACCTGTAGGATCGTACAGGTTTACGCAAGAAAATGGTTTGTT', 'ATAGTCGAATAACACCGTGCGTGTTGACTATTTTACCTCTGGCGG', 'TGATATACTAGAGAAAGAGGAGAAATACTAGATGACCATGATTACGCCAAGCG', 'CGCAATTAACCCTCACTAAAGGGAACAAAAGCTGGAGCTCCACCG', 'CGGTGGCGGCAGCACTAGAGCTAGTGGATCCCCCGG', 'GCTGTAGAAATTCGATATCAAGCTTATCGATACCGTCGACCTCGAGGGG', 'GGGCCCGGTACCCAATTCGCCCTATAGTGAGTCGTATTACGCG', 'CGCTCACTGGCCGTCGTTTTACAACGTCGTGACTGGGAAAACC', 'TGGCGTTACCCAACTTAATCGCCTTGCAGCACATCCCCCTTTC', 'GCCAGCTGGCGTAATAGCGAAGAGGCCCGCACCGATCG', 'CCCTTCCCAACAGTTGCGCAGCCTGAATAATAACGCTGATAGTGCTA', 'TGTAGATCGCTACTAGAGCCAGGCATCAAATAAAACGAAAGGCTCAGTCG', 'AGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTC', 'CTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGT', 'TTATACAGTTCCTGAAGATAGATTAAGGCAC']
+
+    data2 = ['TGTACGATCCTACAGGTGCTTA', 'ACGCACGGTGTTATTCGACTATAACAAACCATTTTCTTGCGTAAACC', 'TCTAGTATTTCTCCTCTTTCTCTAGTATATCACCGCCAGAGGTAAAATAGTCAAC', 'TTCCCTTTAGTGAGGGTTAATTGCGCGCTTGGCGTAATCATGGTCA', 'AGTGCTGCCGCCACCGCGGTGGAGCTCCAGCTTTTG', 'CGATAAGCTTGATATCGAATTTCTACAGCCCGGGGGATCCACTAGCTC', 'CGAATTGGGTACCGGGCCCCCCCTCGAGGTCGACGGTA', 'ACGACGGCCAGTGAGCGCGCGTAATACGACTCACTATAGGG', 'GCGATTAAGTTGGGTAACGCCAGGGTTTTCCCAGTCACGACGTTG', 'CGCTATTACGCCAGCTGGCGAAAGGGGGATGTGCTGCAAG', 'GCGCAACTGTTGGGAAGGGCGATCGGTGCGGGCCT', 'CCTGGCTCTAGTAGCGATCTACACTAGCACTATCAGCGTTATTATTCAGGC', 'CAGATAAAACGAAAGGCCCAGTCTTTCGACTGAGCCTTTCGTTTTATTTGAT', 'AGGTGAGCCAGTGTGACTCTAGTAGAGAGCGTTCACCGACAAACAA', 'GTGCCTTAATCTATCTTCAGGAACTGTATAAACGCAGAAAGGCCCACCC']
+    data3 = 29
     data4 = 37
     data5 = 1e-8
 
-    veri = Verification(data1, data2, data3, data4, data5)
+    veri = Verification(data1, data2[1:], data3, data4, data5)
     ver_info = veri.analysis_two()
     print(len(ver_info), ver_info)
+
+    ver_info1 = veri.analysis_three()
+    print(len(ver_info1), ver_info1)
 
 

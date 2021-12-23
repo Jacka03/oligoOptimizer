@@ -196,8 +196,8 @@ class Splicing:
                     tem_tm = self.cal_tm(self.gene[fir_cut: sec_cut])  # 计算这段gene的tm
                     bef_tm = result[i, 1::2]  # 取出前面所有tm
                     bef_tm = np.append(bef_tm, tem_tm)  # 将这段gene的tm添加到之前中
-                    if tm_mea != 0.:
-                        bef_tm = np.append(bef_tm, tm_mea)  # 将这段gene的tm添加到之前中
+                    # if tm_mea != 0.:
+                    #     bef_tm = np.append(bef_tm, tm_mea)  # 将这段gene的tm添加到之前中
                     tm_std = np.std(bef_tm)  # 计算标准差
                     bef_arr = result[i, :]  # 获取数组，转化为列表
                     bef_arr = bef_arr.tolist()

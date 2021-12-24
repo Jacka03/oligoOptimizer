@@ -78,6 +78,9 @@ new Vue({
 
             arr: [],
             anotherArr: [],
+
+            arr1: [],
+            anotherArr1: [],
         }
     },
 
@@ -141,11 +144,12 @@ new Vue({
 
         download(res) {
             var that = this;
-            var input = that.arr;
+            var input = that.arr1;
 
             if (res == 'res2') {
-                input = that.anotherArr;
+                input = that.anotherArr1;
             }
+            console.log(input);
             // {#console.log(this.arr);#}
             axios.post("/download/", input, {responseType: 'blob'}).then(function (response) {
                 // {#console.log(response);#}
@@ -215,12 +219,15 @@ new Vue({
             that.output2 = false;
             that.arr = [];
             that.anotherArr = [];
+            that.arr1 = [];
+            that.anotherArr1 = [];
 
             if (that.dynamicValidateForm.pools == 1) {
                 axios.post("/assembly/", formData).then(function (response) {
                     that.arr = response.data.arr;
+                    that.arr1 = response.data.arr;
                     // console.log(that.arr)
-                    that.arr = that.test(that.arr)
+                    that.arr = that.test(that.arr);
 
                     that.activeName = 'output1';
                     that.output1 = true;
@@ -235,8 +242,11 @@ new Vue({
             } else {
                 axios.post("/assemblyPools/", formData).then(function (response) {
                     that.arr = response.data.arr;
+                    that.arr1 = response.data.arr;
                     // console.log(that.arr)
-                    that.arr = that.test(that.arr)
+                    that.arr = that.test(that.arr);
+                    // console.log(response.data.arr);
+                    // console.log(that.arr1);
 
                     that.activeName = 'output1';
                     that.output1 = true;
@@ -260,8 +270,10 @@ new Vue({
             axios.post("/analysis/", nextCal).then(function (response) {
                 if(res == 'res1') {
                     that.arr[index]["analyInfo"] = response.data.analyInfo;
+                    that.arr1[index]["analyInfo"] = response.data.analyInfo;
                 } else if(res == 'res2') {
                     that.anotherArr[index]["analyInfo"] = response.data.analyInfo;
+                    that.anotherArr1[index]["analyInfo"] = response.data.analyInfo;
                 }
 
                 that.dynamicValidateForm.pools = 1;
@@ -289,6 +301,7 @@ new Vue({
                 if (that.dynamicValidateForm.pools === 1) {
                     axios.post("/assembly/", formData).then(function (response) {
                         that.anotherArr = response.data.arr;
+                        that.anotherArr1 = response.data.arr;
                         that.anotherArr = that.test(that.anotherArr)
 
                         // console.log(that.anotherArr)
@@ -305,6 +318,7 @@ new Vue({
                 } else {
                     axios.post("/assemblyPools/", formData).then(function (response) {
                         that.anotherArr = response.data.arr;
+                        that.anotherArr1 = response.data.arr;
                         // console.log(that.anotherArr);
                         that.anotherArr = that.test(that.anotherArr);
                         that.activeName = 'output2';

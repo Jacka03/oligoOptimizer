@@ -154,7 +154,7 @@ class Verification:
                 for my_complex, conc in tube_results.tubes[t].complex_concentrations.items():
                     all_conc[my_complex.name] = conc  # 反应后每个试管中DNA的浓度
 
-        print("n = {0}, analysis time:{1}, {2}".format(self.n, time.time() - start, len(all_conc)))
+        # print("n = {0}, analysis time:{1}, {2}".format(self.n, time.time() - start, len(all_conc)))
         # all_conc = {}  # 记录结果
         # for t in tubes:
         #     for my_complex, conc in tube_results.tubes[t].complex_concentrations.items():

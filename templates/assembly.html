@@ -167,7 +167,7 @@
                                             <el-input class="input_number"
                                                       size="small"
                                                       type='number'
-                                                      v-model="dynamicValidateForm.minLen"></el-input>
+                                                      v-model.number="dynamicValidateForm.minLen"></el-input>
                                         </el-form-item>
                                     </el-col>
 
@@ -178,7 +178,7 @@
                                             <el-input class="input_number"
                                                       size="small"
                                                       type='number'
-                                                      v-model="dynamicValidateForm.maxLen"></el-input>
+                                                      v-model.number="dynamicValidateForm.maxLen"></el-input>
                                         </el-form-item>
                                     </el-col>
                                 </el-form-item>
@@ -202,7 +202,7 @@
                                         <el-input class="input_number"
                                                   size="small"
                                                   type='number'
-                                                  v-model="dynamicValidateForm.pools"></el-input>
+                                                  v-model.number="dynamicValidateForm.pools"></el-input>
                                     </el-form-item>
 
                                 </div>
@@ -221,13 +221,14 @@
                                             size="small"
                                             style="margin-left: 0px; ">
                                         <el-col :span="8">
-                                            <el-form-item prop="temperature" label="temperature:"
+                                            <el-form-item prop="temperature"
+                                                          label="temperature:"
                                                           class="el-form-item_line"
                                                           required>
                                                 <el-input class="input_number"
                                                           size="small"
                                                           type='number'
-                                                          v-model="dynamicValidateForm.temperature"></el-input>
+                                                          v-model.number="dynamicValidateForm.temperature"></el-input>
                                                 &#8451;
                                             </el-form-item>
                                         </el-col>
@@ -239,7 +240,7 @@
                                                 <el-input class="input_number"
                                                           size="small"
                                                           type='number'
-                                                          v-model="dynamicValidateForm.concentrations"></el-input>
+                                                          v-model.number="dynamicValidateForm.concentrations"></el-input>
                                                 mM
                                             </el-form-item>
                                         </el-col>
@@ -368,6 +369,7 @@
                                                         required>
                                                     <el-input class="input_number"
                                                               size="small"
+                                                              type='number'
                                                               v-model="item_i.temperature"></el-input>
                                                     &#8451;
                                                 </el-form-item>
@@ -380,6 +382,7 @@
                                                         required>
                                                     <el-input class="input_number"
                                                               size="small"
+                                                              type='number'
                                                               v-model="item_i.concentrations"></el-input>
                                                     mM
                                                 </el-form-item>

@@ -20,9 +20,13 @@ new Vue({
                 result: 'res1',
                 minLen: 20,
                 maxLen: 30,
+                pools: 2,
+                temperature: 37,
+                concentrations: 1,
+
                 resultType: 'Gap',
                 verification: 'No',
-                pools: 2,
+
                 tableData: [
                     {
                         name: 'K',
@@ -57,8 +61,7 @@ new Vue({
                     }],
                 geneName: null,
                 geneDesc: null,
-                temperature: 37,
-                concentrations: 1,
+
                 gene: null,
             },
 

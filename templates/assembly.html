@@ -17,7 +17,7 @@
             </div>
 
             <div class="menu-style">
-                <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal"
+                <el-menu default-active="second" class="el-menu-demo" mode="horizontal"
                          background-color="#545c64"
                          text-color="#fff"
                          @select="handleSelect"
@@ -41,7 +41,7 @@
 
             <el-container>
                 <div id="show" class="main-height main-style"
-                     style="background-color: #eeeeee;">
+                     style="background-color: white;">
 
                     <el-tabs type="border-card" style="border: 0"
                              v-model="activeName"
@@ -614,5 +614,7 @@
 <script src="../static/js/axios-0.18.0.js"></script>
 <script src="../static/js/jquery.min.js"></script>
 <script src="../static/element-ui/lib/index.js"></script>
+
 <script src="../static/js/assembly.js"></script>
+
 </html>

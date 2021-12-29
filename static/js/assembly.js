@@ -89,9 +89,11 @@ new Vue({
     },
 
     methods: {
-        handleSelect(key) {
-            var that = this;
-            that.activeIndex = key;
+        handleSelect(key, keyPath) {
+            // var that = this;
+            this.activeIndex = key;
+            console.log(this.activeIndex);
+            // this.$emit.activeIndex = key;
         },
 
         test(resArr) {

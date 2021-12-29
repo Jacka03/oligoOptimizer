@@ -494,19 +494,22 @@ class Splicing:
                 tem[0] = "R{0}".format(i)
                 result.append(tem)
 
+        primer = {}
         # [ind, tem_gene, tem_tm, overlap, len(tem_gene)]
         # 第一段 可以写死
         len1 = info[0][4] - info[0][3]
         f_gene = info[0][1][:len1]
         result.append(["F_Primer", f_gene, round(self.cal_tm(f_gene), 2), '', len1])
-
+        primer['F_Primer'] = f_gene
         # len1 = info[-1][2] - info[-1][4]
         if len_g1 != len_g2:
             result.append(["R_Primer", info[-1][1], round(self.cal_tm(info[-1][1]), 2), '', len(info[-1][1])])
+            primer['R_Primer'] = info[-1][1]
         else:
             len1 = info[-1][3]
             f_gene = info[-1][1]
             result.append(["R_Primer", f_gene[:len1], round(self.cal_tm(f_gene[:len1]), 2), '', info[-1][3]])
+            primer['R_Primer'] = f_gene[:len1]
 
         # overlap的信息
         overlap_data = {
@@ -515,12 +518,12 @@ class Splicing:
             'range': round(max(data) - min(data), 2),
             'mean': round(np.mean(data), 2),
             'std': round(np.std(data), 2),
-            'result': result
+            'result': result,
         }
         if self.tail:
             # print(self.gene_len_sor, cut_of_index[-1][2])
             overlap_data['tail'] = self.gene[self.gene_len_sor: cut_of_index[-1][2]]
-        return overlap_data
+        return overlap_data, primer
 
     def cal_mean_std(self, index):
         # 根据一个切割位点list转化为[[i1, i1, i2, i2, tm], [i2, i2, i3, i3, tm], ...]的形式, 方便后面计算这种切割的overlap的tm
@@ -552,10 +555,10 @@ class Splicing:
         # print(cut_of_index)
 
         res1, res2 = self.get_gene_list(cut_of_index)
-        info = self.get_more_info(res1, res2, cut_of_index)
+        info, primer = self.get_more_info(res1, res2, cut_of_index)
 
         # info for valification
-        next_cal = [res1, res2, len(cut_of_index)]
+        next_cal = [res1, res2, len(cut_of_index), primer]
         return next_cal, info
 
     def cal_for_pool(self):
@@ -578,9 +581,9 @@ class Splicing:
         cut_of_index = self.return_result(index, tm)
 
         res1, res2 = self.get_gene_list(cut_of_index)
-        info = self.get_more_info(res1, res2, cut_of_index)
+        info, primer = self.get_more_info(res1, res2, cut_of_index)
 
-        next_cal = [res1, res2, len(cut_of_index)]
+        next_cal = [res1, res2, len(cut_of_index), primer]
         return next_cal, info
 
 

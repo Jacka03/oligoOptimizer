@@ -5,7 +5,7 @@ from nupack import SetSpec, RawStrand, RawComplex, Strand, Complex, Tube, tube_a
 
 
 class Verification:
-    def __init__(self, list_g1, list_g2, len1, temp, conc):
+    def __init__(self, list_g1, list_g2, len1, temp, conc, primer):
         self.list_g1 = list_g1  # 上面的基因片段
         self.list_g2 = list_g2  # 下面的基因片段
         self.gene_list = list_g1 + list_g2
@@ -18,11 +18,13 @@ class Verification:
 
         self.c_gene = conc  # 检验的时候反应的基因序列的浓度
 
-        self.first_check = conc / 10  # 第一次验证时的浓度
+        self.first_check = conc / 1000  # 第一次验证时的浓度
         self.second_check = 1e-14  # 第二次验证时的浓度
         self.temp = temp  # 验证 时的温度
 
         self.n = 8000  # 每次进行运算的tube个数
+        self.F_Primer = primer['F_Primer']
+        self.R_Primer = primer['R_Primer']
 
     def get_strands_tube_tow(self):
         # 获取试管中只有两条基因片段的所有情况
@@ -61,6 +63,7 @@ class Verification:
         all_conc = {}
 
         tubes_list = [tubes[i:i + self.n] for i in range(0, len(tubes), self.n)]
+
         for i in tubes_list:
             tube_results = tube_analysis(tubes=i, model=my_model)
             for t in i:
@@ -210,7 +213,58 @@ class Verification:
         # print('总数:{0}'.format(len(all_conc)))
         return error
 
+    def get_strand_tube_all(self):
+        # 获取试管中只有两条基因片段的所有情况
 
+        self.list_g1 = self.list_g1[:-1]
+        self.len_g1 = len(self.list_g1)
+        strands = {}
+        for i in range(0, self.len_g1):
+            strands[Strand(self.list_g1[i], name="F{0}".format(i + 1))] = self.c_gene
+            strands[Strand(self.list_g2[i], name="R{0}".format(i + 1))] = self.c_gene
+
+        strands[Strand(self.F_Primer, name="F_Primer")] = self.c_gene
+        strands[Strand(self.R_Primer, name="R_Primer")] = self.c_gene
+
+        my_model = Model(material='dna', celsius=self.temp)
+        t = Tube(strands=strands, complexes=SetSpec(max_size=2), name='t')  # complexes defaults to [A, B]
+        tube_results = tube_analysis(tubes=[t], model=my_model)
+
+        all_conc = {}
+        for my_complex, conc in tube_results.tubes[t].complex_concentrations.items():
+            all_conc[my_complex.name] = conc  # 反应后每个试管中DNA的浓度
+        all_conc = sorted(all_conc.items(), key=lambda d: d[1], reverse=True)  # 排序
+
+        # print(all_conc)
+
+        error = {}
+        for key, val in all_conc:
+            if key.count('+') == 1:# and val > self.first_check:
+                tem_split = key[1:-1].split('+')  # # 先去除括号，在根据+分割字符串
+
+                t1 = tem_split[0][1:]
+                t2 = tem_split[1][1:]
+                # print(t1, t2)
+                # print(t1.isdigit(), t2.isdigit())
+                if not t1.isdigit() or not t2.isdigit():
+                    # 处理含有primer的片段，都是错配的
+                    # primer+pirmer, primer+x         ,  x+primer
+                    error['{0}, {1}'.format(tem_split[0], tem_split[1])] = val
+
+                elif tem_split[0][0] == tem_split[1][0]:  # 错配
+                    # Rx+Rx ; Fx+Fx
+                    error['{0}, {1}'.format(tem_split[0], tem_split[1])] = val
+                elif tem_split[0][0] == 'F' and int(t1) - int(t2) not in [0, 1]:
+                    error['{0}, {1}'.format(tem_split[0], tem_split[1])] = val
+                elif tem_split[0][0] == 'R' and int(t1) - int(t2) not in [0, -1]:
+                    error['{0}, {1}'.format(tem_split[0], tem_split[1])] = val
+            # 判断条件有待改进
+            # elif val < self.first_check:  #
+            #     break
+
+        # print(error)
+
+        return error
 
 # if __name__ == '__main__':
 #
@@ -227,5 +281,3 @@ class Verification:
 #
 #     ver_info1 = veri.analysis_three()
 #     print(len(ver_info1), ver_info1)
-
-

@@ -1,0 +1,63 @@
+<!DOCTYPE html  xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>home</title>
+    <link rel="stylesheet" href="../static/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="../static/css/main.css">
+    <link rel="stylesheet" href="../static/css/assembly.css">
+
+</head>
+<body>
+<div id="app" style="width: 1024px; margin: auto;">
+    <el-container>
+        <el-main>
+            <div class="head-style font-style">
+                OligoOptimizer
+            </div>
+
+            <div class="menu-style">
+                <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal"
+                         background-color="#545c64"
+                         text-color="#fff"
+                         @select="handleSelect"
+                         active-text-color="#ffd04b">
+
+                    <el-menu-item index="first" class="menu-item">
+                        <a href="/introduction" target="_self">introduction</a>
+                    </el-menu-item>
+
+                    <el-menu-item index="second" class="menu-item">
+                        <a href="/assembly" target="_self">home</a>
+                    </el-menu-item>
+
+                    <el-menu-item index="third" class="menu-item">
+                        <a href="/doc" target="_self">doc</a>
+                    </el-menu-item>
+
+                </el-menu>
+            </div>
+
+            <el-container>
+                <div id="show" class="main-height main-style"
+                     style="background-color: #eeeeee;">
+                    <p>
+                        The webserver OligoOptimizer is developed for oligonucleotide assembling of gene synthesis. It can design oligonucleotide sets for gene synthesis by polymerase chain reaction (PCR). It offers much flexibility with no constraints on gene to be synthesized. Based on an integrated algorithm, the oligodeoxynucleotides with homologous melting temperature necessary for two-step assembly PCR-based synthesis of the desired gene are finially outputted. Furthermore, it can analyse the mismatches between oligonucleotides based on thermodynamic processes and provide the concentration of potential mismatches. To output gapless oligonucleotide sets for PCR-based synthesis, users can select the item 'Gapless' in the 'Result Type' options. When selecting 'Gapless' and tuning the parameters in 'Parameters For Gene Synthesis' options, the outputted oligonucleotide sets also can be used for LCR-based gene synthesis. For detailed instructions, users can be referred to 'doc'.
+                    </p>
+
+                </div>
+            </el-container>
+
+        </el-main>
+    </el-container>
+
+</div>
+
+</body>
+
+<script src="../static/js/vue.js"></script>
+<script src="../static/js/axios-0.18.0.js"></script>
+<script src="../static/js/jquery.min.js"></script>
+<script src="../static/element-ui/lib/index.js"></script>
+<script src="../static/js/assembly.js"></script>
+</html>

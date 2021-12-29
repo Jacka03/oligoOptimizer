@@ -1,0 +1,98 @@
+<!DOCTYPE html  xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>home</title>
+    <link rel="stylesheet" href="../static/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="../static/css/main.css">
+    <link rel="stylesheet" href="../static/css/assembly.css">
+
+</head>
+<body>
+<div id="app" style="width: 1024px; margin: auto;">
+    <el-container>
+        <el-main>
+            <div class="head-style font-style">
+                OligoOptimizer
+            </div>
+
+            <div class="menu-style">
+                <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal"
+                         background-color="#545c64"
+                         text-color="#fff"
+                         @select="handleSelect"
+                         active-text-color="#ffd04b">
+
+                    <el-menu-item index="first" class="menu-item">
+                        <a href="/introduction" target="_self">introduction</a>
+                    </el-menu-item>
+
+                    <el-menu-item index="second" class="menu-item">
+                        <a href="/assembly" target="_self">home</a>
+                    </el-menu-item>
+
+                    <el-menu-item index="third" class="menu-item">
+                        <a href="/doc" target="_self">doc</a>
+                    </el-menu-item>
+
+
+                </el-menu>
+            </div>
+
+            <el-container>
+                <div id="show" class="main-height main-style"
+                     style="background-color: #eeeeee;">
+                    <p>
+                        Email Address: required.
+                    </p>
+                    <p>
+                        Gene Information: Input 'DNA seq' from 5' to 3' end. Length Range from 0.1 to 100 kbp. The 'DNA
+                        seq' is required and the other items is optional.
+
+                    </p>
+                    <p>
+                        Parameters For Gene Synthesis: Parameters for real time PCR assembling.
+
+                    </p>
+                    <p>
+                        Overlap Length: Users can tune this parameter to change the length of overlap between oligos and
+                        output different oligonucleotide sets. Default parameter minimum 20bp and maximum 30bp will
+                        produce oligo overlap length range from 16bp to 34bp.
+
+                    </p>
+                    <p>
+                        Result Type: Users can select 'Gapless' or 'Gap' oligo set for PCR assembly. When selecting
+                        'Gap', the outputted oligonucleotide sets with gap between consecutive oligonucleotides possess
+                        more uniform melting temperature. The outputted gapless oligonucleotide sets also can be used
+                        for LCR-based gene synthesis.
+
+                    </p>
+                    <p>
+                        Long DNA Assembly(optional): Sequence will be partitioned into # of pools of
+                        oligodeoxynucleotides with homologous melting temperature for long sequence.
+
+                    </p>
+
+                    <p>
+                        Is Verification Required: Analyse the mismatches between oligonucleotides based on thermodynamic
+                        processes and provide the concentration of potential mismatches. It will analyse the potential
+                        mismatches between any oligonucleotide couples and triplets and present the mismatches and their
+                        concentration above ten percent of input concentration.
+
+                    </p>
+                </div>
+            </el-container>
+
+        </el-main>
+    </el-container>
+
+</div>
+
+</body>
+
+<script src="../static/js/vue.js"></script>
+<script src="../static/js/axios-0.18.0.js"></script>
+<script src="../static/js/jquery.min.js"></script>
+<script src="../static/element-ui/lib/index.js"></script>
+<script src="../static/js/assembly.js"></script>
+</html>

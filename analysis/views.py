@@ -47,15 +47,18 @@ class AssemblyView(View):
             if data.get('verification') == 'Yes':
                 conc = data['concentrations'] * 1e-8
                 # 分析过程
-                analy = Verification(next_cal[0], next_cal[1][1:], next_cal[2], data['temperature'], conc)
+                analy = Verification(next_cal[0], next_cal[1][1:], next_cal[2], data['temperature'], conc, next_cal[3])
 
                 start = time.time()
-                analy_info = analy.analysis_two()
-                mid = time.time()
-                analy_info.update(analy.analysis_three())
+                analy_info = analy.get_strand_tube_all()
+
+                # analy_info = analy.analysis_two()
+                # mid = time.time()
+                # analy_info.update(analy.analysis_three())
                 end = time.time()
-                models.VerificationInfo.objects.create(cube_count=8000, gene_segment_count=next_cal[2],
-                                                       verification_two_time=mid-start, verification_three_time=end-mid)
+                print(end - start)
+                # models.VerificationInfo.objects.create(cube_count=8000, gene_segment_count=next_cal[2],
+                #                                        verification_two_time=mid-start, verification_three_time=end-mid)
                 # print("two:{0}, three:{1}".format(mid-start, end-mid))
 
                 analy_info_list = []
@@ -151,18 +154,22 @@ class AnalysisView(View):
             next_cal = json.loads(request.body)
             # next_cal = data['nextCal']
             # 分析过程
-            temp = next_cal[4] * 1e-8
+            temp = next_cal[5] * 1e-8
             # print(temp)
-            analy = Verification(next_cal[0], next_cal[1][1:], next_cal[2], next_cal[3], temp)
+            analy = Verification(next_cal[0], next_cal[1][1:], next_cal[2], next_cal[4], temp, next_cal[3])
 
             start = time.time()
-            analy_info = analy.analysis_two()
-            mid = time.time()
-            analy_info.update(analy.analysis_three())
-            end = time.time()
 
-            models.VerificationInfo.objects.create(cube_count=8000, gene_segment_count=next_cal[2],
-                                                   verification_two_time=mid-start, verification_three_time=end-mid)
+            analy_info = analy.get_strand_tube_all()
+
+            # analy_info = analy.analysis_two()
+            # mid = time.time()
+            # analy_info.update(analy.analysis_three())
+            end = time.time()
+            print(end - start)
+
+            # models.VerificationInfo.objects.create(cube_count=8000, gene_segment_count=next_cal[2],
+            #                                        verification_two_time=mid-start, verification_three_time=end-mid)
 
             analy_info_list = []
             context = {}
@@ -239,3 +246,19 @@ class DownloadView(View):  # 导出excel数据
             print(err)
             raise Http404(err)
         return response  # 返回
+
+
+class IntroductionView(View):
+    def get(self, request):
+        return render(request, 'introduction.html')
+
+    def post(self, request):
+        return
+
+
+class DocView(View):
+    def get(self, request):
+        return render(request, 'doc.html')
+
+    def post(self, request):
+        return

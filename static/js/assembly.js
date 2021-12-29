@@ -89,6 +89,11 @@ new Vue({
     },
 
     methods: {
+        handleSelect(key, keyPath) {
+            console.log(key);
+            console.log(keyPath);
+            this.activeIndex = key;
+        },
 
         test(resArr) {
             // view tail

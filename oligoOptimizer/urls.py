@@ -22,5 +22,7 @@ urlpatterns = [
     path('assemblyPools/', include('analysis.urls')),
     path('analysis/', include('analysis.urls')),
     path('download/', include('analysis.urls')),
+    path('introduction/', include('analysis.urls')),
+    path('doc/', include('analysis.urls')),
 ]
 

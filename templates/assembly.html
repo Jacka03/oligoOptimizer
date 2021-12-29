@@ -322,35 +322,43 @@
                                 </div>
 
                                 <div v-if="item_i.analyInfo">
+
                                     <h3>Verification information</h3>
-                                    <el-table :data="item_i.analyInfo"
-                                              :cell-style="{padding:3+'px'}"
-                                              :row-style="{height:'26px'}"
-                                              border
-                                              v-if="showTable"
-                                              stripe
-                                              :header-cell-style="{padding:3+'px', fontSize:'14px'}">
+                                    <div v-if="item_i.analyInfo.length > 0">
 
-                                        <el-table-column :cell-style="{padding:3+'px'}"
-                                                {#prop="key"#}
-                                                         align="center"
-                                                         label="key"
-                                                         show-overflow-tooltip>
-                                            <template slot-scope="scope">
-                                                {[ scope.row.key ]}
-                                            </template>
-                                        </el-table-column>
+                                        <el-table :data="item_i.analyInfo"
+                                                  :cell-style="{padding:3+'px'}"
+                                                  :row-style="{height:'26px'}"
+                                                  border
+                                                  v-if="showTable"
+                                                  stripe
+                                                  :header-cell-style="{padding:3+'px', fontSize:'14px'}">
 
-                                        <el-table-column :cell-style="{padding:3+'px'}"
-                                                {#prop="value"#}
-                                                         align="center"
-                                                         label="value"
-                                                         show-overflow-tooltip>
-                                            <template slot-scope="scope">
-                                                {[ scope.row.value ]}
-                                            </template>
-                                        </el-table-column>
-                                    </el-table>
+                                            <el-table-column :cell-style="{padding:3+'px'}"
+                                                    {#prop="key"#}
+                                                             align="center"
+                                                             label="key"
+                                                             show-overflow-tooltip>
+                                                <template slot-scope="scope">
+                                                    {[ scope.row.key ]}
+                                                </template>
+                                            </el-table-column>
+
+                                            <el-table-column :cell-style="{padding:3+'px'}"
+                                                    {#prop="value"#}
+                                                             align="center"
+                                                             label="value"
+                                                             show-overflow-tooltip>
+                                                <template slot-scope="scope">
+                                                    {[ scope.row.value ]}
+                                                </template>
+                                            </el-table-column>
+                                        </el-table>
+                                    </div>
+                                    <div v-else>
+                                        <p>null</p>
+                                    </div>
+
                                 </div>
 
                                 <div
@@ -489,34 +497,40 @@
 
                                 <div v-if="item_i.analyInfo">
                                     <h3>Verification information</h3>
-                                    <el-table :data="item_i.analyInfo"
-                                              :cell-style="{padding:3+'px'}"
-                                              :row-style="{height:'26px'}"
-                                              border
-                                              v-if="showTable"
-                                              stripe
-                                              :header-cell-style="{padding:3+'px', fontSize:'14px'}">
+                                    <div v-if="item_i.analyInfo.length > 0">
+                                        <el-table :data="item_i.analyInfo"
+                                                  :cell-style="{padding:3+'px'}"
+                                                  :row-style="{height:'26px'}"
+                                                  border
+                                                  v-if="showTable"
+                                                  stripe
+                                                  :header-cell-style="{padding:3+'px', fontSize:'14px'}">
 
-                                        <el-table-column :cell-style="{padding:3+'px'}"
-                                                {#prop="key"#}
-                                                         align="center"
-                                                         label="key"
-                                                         show-overflow-tooltip>
-                                            <template slot-scope="scope">
-                                                {[ scope.row.key ]}
-                                            </template>
-                                        </el-table-column>
+                                            <el-table-column :cell-style="{padding:3+'px'}"
+                                                    {#prop="key"#}
+                                                             align="center"
+                                                             label="key"
+                                                             show-overflow-tooltip>
+                                                <template slot-scope="scope">
+                                                    {[ scope.row.key ]}
+                                                </template>
+                                            </el-table-column>
 
-                                        <el-table-column :cell-style="{padding:3+'px'}"
-                                                {#prop="value"#}
-                                                         align="center"
-                                                         label="value"
-                                                         show-overflow-tooltip>
-                                            <template slot-scope="scope">
-                                                {[ scope.row.value ]}
-                                            </template>
-                                        </el-table-column>
-                                    </el-table>
+                                            <el-table-column :cell-style="{padding:3+'px'}"
+                                                    {#prop="value"#}
+                                                             align="center"
+                                                             label="value"
+                                                             show-overflow-tooltip>
+                                                <template slot-scope="scope">
+                                                    {[ scope.row.value ]}
+                                                </template>
+                                            </el-table-column>
+                                        </el-table>
+                                    </div>
+                                    <div v-else>
+                                        <p>null</p>
+                                    </div>
+
                                 </div>
 
                                 <div

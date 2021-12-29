@@ -20,7 +20,7 @@ new Vue({
                 result: 'res1',
                 minLen: 20,
                 maxLen: 30,
-                pools: 2,
+                pools: 1,
                 temperature: 37,
                 concentrations: 1,
 

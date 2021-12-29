@@ -56,7 +56,7 @@ class AssemblyView(View):
                 # mid = time.time()
                 # analy_info.update(analy.analysis_three())
                 end = time.time()
-                print(end - start)
+                # print(end - start)
                 # models.VerificationInfo.objects.create(cube_count=8000, gene_segment_count=next_cal[2],
                 #                                        verification_two_time=mid-start, verification_three_time=end-mid)
                 # print("two:{0}, three:{1}".format(mid-start, end-mid))
@@ -166,7 +166,7 @@ class AnalysisView(View):
             # mid = time.time()
             # analy_info.update(analy.analysis_three())
             end = time.time()
-            print(end - start)
+            # print(end - start)
 
             # models.VerificationInfo.objects.create(cube_count=8000, gene_segment_count=next_cal[2],
             #                                        verification_two_time=mid-start, verification_three_time=end-mid)

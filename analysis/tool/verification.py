@@ -18,7 +18,7 @@ class Verification:
 
         self.c_gene = conc  # 检验的时候反应的基因序列的浓度
 
-        self.first_check = conc / 1000  # 第一次验证时的浓度
+        self.first_check = conc / 1000 # 第一次验证时的浓度
         self.second_check = 1e-14  # 第二次验证时的浓度
         self.temp = temp  # 验证 时的温度
 
@@ -239,7 +239,7 @@ class Verification:
 
         error = {}
         for key, val in all_conc:
-            if key.count('+') == 1:# and val > self.first_check:
+            if key.count('+') == 1 and val > self.first_check:
                 tem_split = key[1:-1].split('+')  # # 先去除括号，在根据+分割字符串
 
                 t1 = tem_split[0][1:]
@@ -259,8 +259,8 @@ class Verification:
                 elif tem_split[0][0] == 'R' and int(t1) - int(t2) not in [0, -1]:
                     error['{0}, {1}'.format(tem_split[0], tem_split[1])] = val
             # 判断条件有待改进
-            # elif val < self.first_check:  #
-            #     break
+            elif val < self.first_check:  #
+                break
 
         # print(error)
 

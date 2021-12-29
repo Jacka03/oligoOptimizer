@@ -9,5 +9,6 @@ urlpatterns = [
     path('assemblyPools/', views.AssemblyPoolsView.as_view()),
     path('analysis/', views.AnalysisView.as_view()),
     path('download/', views.DownloadView.as_view()),
-    path('dco/', views.DocView.as_view()),
+    path('introduction/', views.IntroductionView.as_view()),
+    path('doc/', views.DocView.as_view()),
 ]

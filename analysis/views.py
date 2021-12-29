@@ -6,7 +6,7 @@ import re
 import pandas as pd
 
 from django.http import JsonResponse, Http404, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 # Create your views here.
 from django.views import View

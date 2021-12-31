@@ -17,8 +17,8 @@ The webserver OligoOptimizer is developed for oligonucleotide assembling of gene
              (Ri)                                                               ---------
                                                                                 (R_Primer)
 ~~~
-![img.png](img.png)
+![img.png](readme/img.png)
 
-![img_1.png](img_1.png)
+![img_1.png](readme/img_1.png)
 
-![img_2.png](img_2.png)
+![img_2.png](readme/img_2.png)

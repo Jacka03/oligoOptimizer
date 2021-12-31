@@ -1,3 +1,0 @@
-# oligoOptimizer
-
-- cal_tm

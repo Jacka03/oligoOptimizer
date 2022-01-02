@@ -47,13 +47,10 @@ class AssemblyView(View):
             if data.get('verification') == 'Yes':
                 conc = data['concentrations'] * 1e-8
                 # 分析过程
-                analy = Verification(next_cal[0], next_cal[1][1:], next_cal[2], data['temperature'], conc, next_cal[3])
+                analy = Verification(next_cal, data['temperature'], conc, conc*10)
 
-                start = time.time()
                 analy_info = analy.get_strand_tube_all()
 
-                end = time.time()
-                # print(end - start)
                 # models.VerificationInfo.objects.create(cube_count=8000, gene_segment_count=next_cal[2],
                 #                                        verification_two_time=mid-start, verification_three_time=end-mid)
                 # print("two:{0}, three:{1}".format(mid-start, end-mid))

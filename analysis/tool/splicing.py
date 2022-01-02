@@ -39,6 +39,7 @@ class Splicing:
         self.count = 20
 
         self.tail = False
+        self.primer_len = 22
 
     def cal_tm(self, temp_gene):
         """
@@ -441,6 +442,8 @@ class Splicing:
             below_oligo_info.append(['R{0}'.format(index), oligo, round(self.cal_tm(overlap), 2), len(overlap), len(oligo)])
         # 最后一片
         oligo = gene_complement[int(index_list[-1][1]): int(index_list[-1][2])][::-1]
+        if self.tail:  # R_Primer避开添加上去的tail
+            oligo = gene_complement[self.gene_len_sor - self.primer_len: self.gene_len_sor][::-1]
         oligo_list.append(['R_Primer', oligo])
         below_oligo_info.append(['R_Primer', oligo, round(self.cal_tm(oligo), 2), '', len(oligo)])
 
@@ -530,23 +533,9 @@ class Splicing:
         return next_cal, info
 
 
-# if __name__ == '__main__':
-#     a = 'TCTGGCGGTGATATACTAGAGAAAGAGGAGAAATACTAGATGACCATGATTACGCCAA'
-#
-#     b = 'TTATTCGACTATAACAAACCATTTTCTTGCGTAAACCTGTACGATCCTACAGGTGCTT'
-#     print(len(a), len(b))
-#     a = [1, 2, 3]
-#     b = [3, 4, 5, 6]
-#     c = [a, b]
-#     print(c)
-#
-#     tem = 'ACAGCTTCCGAAGGTGAGCC'
-#     print(tem)
-#     print(tem[1:-1])
-#     print(tem[1:-1][::-1])
-
-
-    # data = {'email': '758168660@qq.com', 'geneLen': 638, 'result': 'res1', 'minLen': 20, 'maxLen': 30, 'resultType': 'Gapless', 'verification': 'No', 'pools': 1, 'geneName': 'name', 'geneDesc': 'description', 'temperature': 37, 'concentrations': 1, 'gene': 'taagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacagttgcgcagcctgaataataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata', 'K': 50, 'Mg': 8, 'dNTPs': 4, 'Tris': 10, 'oligo': 10, 'primer': 400, 'Na': 1.2}
-    # sp = Splicing(data)
-    # next_cal, info = sp.cal()
-    # print(info)
+if __name__ == '__main__':
+    data = {'email': '758168660@qq.com', 'geneLen': 638, 'result': 'res1', 'minLen': 20, 'maxLen': 30, 'resultType': 'Gapless', 'verification': 'No', 'pools': 1, 'geneName': 'name', 'geneDesc': 'description', 'temperature': 37, 'concentrations': 1, 'gene': 'taagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacagttgcgcagcctgaataataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata', 'K': 50, 'Mg': 8, 'dNTPs': 4, 'Tris': 10, 'oligo': 10, 'primer': 400, 'Na': 1.2}
+    data['gene'] = data['gene'].upper()
+    sp = Splicing(data)
+    next_cal, info = sp.cal()
+    print(info)

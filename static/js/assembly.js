@@ -22,6 +22,9 @@ new Vue({
                 maxLen: 30,
                 pools: 1,
                 temperature: 37,
+                oligoConc: 10,
+                primerConc: 400,
+
                 concentrations: 1,
 
                 resultType: 'Gap',
@@ -69,11 +72,11 @@ new Vue({
                 {
                     name: 'index', width: 95,
                 },{
-                    name: 'gene', width: 625,
+                    name: "oligo(5'->3')", width: 633,
                 },{
                     name: 'Tm', width: 70,
                 },{
-                    name: 'overlap', width: 88,
+                    name: 'overlap', width: 80,
                 },{
                     name: 'length', width: 75,
                 },
@@ -104,23 +107,24 @@ new Vue({
             if (source.resInfo[5] != undefined) {
                 // console.log(source.resInfo[5])
                 var tail = source.resInfo[5].value
-                tail = tail.split("").reverse().join("")
-                endTail = "";
-                for (var i = 0; i < tail.length; i++) {
-                    if (tail[i] == 'A') {
-                        endTail += 'T';
-                    } else if (tail[i] == 'T') {
-                        endTail += 'A';
-                    } else if (tail[i] == 'C') {
-                        endTail += 'G';
-                    } else if (tail[i] == 'G') {
-                        endTail += 'C';
-                    }
-                }
-                replaceStr = '<span style="color:red;">' + endTail + '</span>';
-                index = resArr[resArr.length - 1]["info"].length - 3;
+                // tail = tail.split("").reverse().join("")
+                // endTail = "";
+                // for (var i = 0; i < tail.length; i++) {
+                //     if (tail[i] == 'A') {
+                //         endTail += 'T';
+                //     } else if (tail[i] == 'T') {
+                //         endTail += 'A';
+                //     } else if (tail[i] == 'C') {
+                //         endTail += 'G';
+                //     } else if (tail[i] == 'G') {
+                //         endTail += 'C';
+                //     }
+                // }
+                replaceStr = '<span style="color:red;">' + tail + '</span>';
+                index = resArr[resArr.length - 1]["info"].length - 2;
                 str = resArr[resArr.length - 1]["info"][index][1];
-                str = str.replace(endTail, replaceStr);
+                // str = str.replace(tail, replaceStr);
+                str = str.substring(0, str.lastIndexOf(tail)) + replaceStr
                 resArr[resArr.length - 1]["info"][index][1] = str;
             }
             return resArr;
@@ -261,14 +265,13 @@ new Vue({
             }
         },
 
-        validation(index, nextCal, tem, concentrations, res) {
+        validation(index, nextCal, tem, oligoConc, primerConc, res) {
             var that = this;
-            nextCal.push(tem);
-            nextCal.push(concentrations);
+            var info = [nextCal, tem, oligoConc, primerConc]
 
             that.verificationLoading = true;
             that.loading = true;
-            axios.post("/analysis/", nextCal).then(function (response) {
+            axios.post("/analysis/", info).then(function (response) {
                 if(res == 'res1') {
                     that.arr[index]["analyInfo"] = response.data.analyInfo;
                 } else if(res == 'res2') {

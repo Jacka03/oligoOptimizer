@@ -32,8 +32,8 @@ class AssemblyView(View):
             next_cal, info = splic.cal()
             end = time.time()
             # add to db
-            models.GeneInfo.objects.create(email=data['email'], gene_len=data['geneLen'], pools=data['pools'],
-                                           min_len=data['minLen'], max_len=data['maxLen'], assembly_time=end-start)
+            # models.GeneInfo.objects.create(email=data['email'], gene_len=data['geneLen'], pools=data['pools'],
+            #                                min_len=data['minLen'], max_len=data['maxLen'], assembly_time=end-start)
 
             # add cal info to context
             tem_res = get_res_info(info)
@@ -45,9 +45,10 @@ class AssemblyView(View):
             }
             # print(context)
             if data.get('verification') == 'Yes':
-                conc = data['concentrations'] * 1e-8
+                oligo_conc = data['oligoConc'] * 1e-9
+                primer_conc = data['primerConc'] * 1e-9
                 # 分析过程
-                analy = Verification(next_cal, data['temperature'], conc, conc*10)
+                analy = Verification(next_cal, data['temperature'], oligo_conc, primer_conc)
 
                 analy_info = analy.get_strand_tube_all()
 
@@ -123,12 +124,13 @@ class AssemblyPoolsView(View):
                     'resInfo': tem_res,
                     'nextCal': next_cal,
                     'temperature': data['temperature'],
-                    'concentrations': data['concentrations']
+                    'oligoConc': data['oligoConc'],
+                    'primerConc': data['primerConc']
                 }
                 arr.append(context)
-            end = time.time()
-            models.GeneInfo.objects.create(email=data['email'], gene_len=data['geneLen'], pools=data['pools'],
-                                           min_len=data['minLen'], max_len=data['maxLen'], assembly_time=end-start)
+            # end = time.time()
+            # models.GeneInfo.objects.create(email=data['email'], gene_len=data['geneLen'], pools=data['pools'],
+            #                                min_len=data['minLen'], max_len=data['maxLen'], assembly_time=end-start)
 
             context = {'arr': arr}
         except Exception as err:
@@ -148,9 +150,10 @@ class AnalysisView(View):
             next_cal = json.loads(request.body)
             # next_cal = data['nextCal']
             # 分析过程
-            temp = next_cal[5] * 1e-8
+            oligo_conc = next_cal[2] * 1e-9
+            primer_conc = next_cal[3] * 1e-9
             # print(temp)
-            analy = Verification(next_cal[0], next_cal[1][1:], next_cal[2], next_cal[4], temp, next_cal[3])
+            analy = Verification(next_cal[0], next_cal[1], oligo_conc, primer_conc)
 
             start = time.time()
 

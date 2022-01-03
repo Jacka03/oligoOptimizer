@@ -14,8 +14,8 @@ class Verification:
         self.oligo_conc = oligo_conc
         self.primer_conc = primer_conc
 
-        self.oligo_check_conc = oligo_conc / 100000  # 第一次验证时的浓度
-        self.primer_check_conc = primer_conc / 100000  # 第一次验证时的浓度
+        self.oligo_check_conc = oligo_conc / 1000  # 第一次验证时的浓度
+        self.primer_check_conc = primer_conc / 1000  # 第一次验证时的浓度
 
     def get_strand_tube_all(self):
         # 获取试管中只有两条基因片段的所有情况

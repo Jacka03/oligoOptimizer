@@ -222,7 +222,7 @@
                                     <el-form-item
                                             size="small"
                                             style="margin-left: 0px; ">
-                                        <el-col :span="8">
+
                                             <el-form-item prop="temperature"
                                                           label="temperature:"
                                                           class="el-form-item_line"
@@ -233,19 +233,28 @@
                                                           v-model.number="dynamicValidateForm.temperature"></el-input>
                                                 &#8451;
                                             </el-form-item>
-                                        </el-col>
+                                        <br>
 
-                                        <el-col :span="8">
-                                            <el-form-item prop="concentrations" label="concentrations:"
+                                            <el-form-item prop="oligoConc" label="oligo_conc:"
                                                           class="el-form-item_line"
                                                           required>
                                                 <el-input class="input_number"
                                                           size="small"
                                                           type='number'
-                                                          v-model.number="dynamicValidateForm.concentrations"></el-input>
-                                                mM
+                                                          v-model.number="dynamicValidateForm.oligoConc"></el-input>
+                                                nM
                                             </el-form-item>
-                                        </el-col>
+                                            <br>
+
+                                            <el-form-item prop="primerConc" label="primer_conc:"
+                                                          class="el-form-item_line"
+                                                          required>
+                                                <el-input class="input_number"
+                                                          size="small"
+                                                          type='number'
+                                                          v-model.number="dynamicValidateForm.primerConc"></el-input>
+                                                nM
+                                            </el-form-item>
                                     </el-form-item>
                                 </div>
 
@@ -387,23 +396,38 @@
 
                                             <el-col :span="8">
                                                 <el-form-item
-                                                        label="concentrations:"
+                                                        label="oligoConc:"
                                                         class="el-form-item_line"
                                                         required>
                                                     <el-input class="input_number"
                                                               size="small"
                                                               type='number'
-                                                              v-model.number="item_i.concentrations"></el-input>
-                                                    mM
+                                                              v-model.number="item_i.oligoConc"></el-input>
+                                                    nM
                                                 </el-form-item>
                                             </el-col>
+
+                                               <el-col :span="8">
+                                                <el-form-item
+                                                        label="primerConc:"
+                                                        class="el-form-item_line"
+                                                        required>
+                                                    <el-input class="input_number"
+                                                              size="small"
+                                                              type='number'
+                                                              v-model.number="item_i.primerConc"></el-input>
+                                                    nM
+                                                </el-form-item>
+                                            </el-col>
+
+
                                         </el-form-item>
 
 
                                         <el-button type="primary"
                                                    size="mini"
                                                    style="margin-left: 235px"
-                                                   @click="validation(i, item_i.nextCal, item_i.temperature, item_i.concentrations, 'res1')">
+                                                   @click="validation(i, item_i.nextCal, item_i.temperature, item_i.oligoConc, item_i.primerConc, 'res1')">
 
                                             Validation
                                         </el-button>
@@ -559,14 +583,26 @@
 
                                             <el-col :span="8">
                                                 <el-form-item
-                                                        label="concentrations:"
+                                                        label="oligoConc:"
                                                         class="el-form-item_line"
                                                         required>
                                                     <el-input class="input_number"
                                                               size="small"
                                                               type='number'
-                                                              v-model.number="item_i.concentrations"></el-input>
-                                                    mM
+                                                              v-model.number="item_i.oligoConc"></el-input>
+                                                    nM
+                                                </el-form-item>
+                                            </el-col>
+                                            <el-col :span="8">
+                                                <el-form-item
+                                                        label="primerConc:"
+                                                        class="el-form-item_line"
+                                                        required>
+                                                    <el-input class="input_number"
+                                                              size="small"
+                                                              type='number'
+                                                              v-model.number="item_i.primerConc"></el-input>
+                                                    nM
                                                 </el-form-item>
                                             </el-col>
                                         </el-form-item>
@@ -574,7 +610,7 @@
                                         <el-button type="primary"
                                                    size="mini"
                                                    style="margin-left: 235px"
-                                                   @click="validation(i, item_i.nextCal, item_i.temperature, item_i.concentrations, 'res2')">
+                                                   @click="validation(i, item_i.nextCal, item_i.temperature, item_i.oligoConc, item_i.primerConc, 'res2')">
 
                                             Validation
                                         </el-button>

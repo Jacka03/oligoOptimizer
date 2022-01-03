@@ -501,9 +501,6 @@ class Splicing:
         # print(cut_of_index)
 
         info, oligo = self.get_oligo(cut_of_index)
-        # print(info)
-        # print(oligo)
-
         # info for valification
         return oligo, info
 
@@ -526,11 +523,9 @@ class Splicing:
 
         cut_of_index = self.return_result(index, tm)
 
-        res1, res2 = self.get_oligo(cut_of_index)
-        info, primer = self.get_more_info(res1, res2, cut_of_index)
-
-        next_cal = [res1, res2, len(cut_of_index), primer]
-        return next_cal, info
+        info, oligo = self.get_oligo(cut_of_index)
+        # info for valification
+        return oligo, info
 
 
 if __name__ == '__main__':

@@ -25,7 +25,7 @@ new Vue({
                 oligoConc: 10,
                 primerConc: 400,
 
-                concentrations: 1,
+                // concentrations: 1,
 
                 resultType: 'Gap',
                 verification: 'No',

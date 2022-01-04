@@ -39,7 +39,8 @@ class Splicing:
         self.count = 20
 
         self.tail = False
-        self.primer_len = 22
+        self.primer_min_len = 18
+        self.primer_max_len = 22 + 1
 
     def cal_tm(self, temp_gene):
         """
@@ -411,6 +412,20 @@ class Splicing:
         self.tail = True
         return tem_index, tem_tm
 
+    def get_primer(self, oligo, data):
+        print(data)
+        result = []
+        for i in range(self.primer_min_len, self.primer_max_len):
+            # 当oligo长度过长时
+            tem_data = data + [self.cal_tm(oligo[:i])]
+            result.append([i, np.std(tem_data)])
+            print((i, self.cal_tm(oligo[:i]), np.std(tem_data)))
+        # print(result)
+        result = self.choose(result)
+        oligo = oligo[:int(result[0][0])]
+
+        return oligo
+
     def get_oligo(self, index_list):
         # 将两个overlap拼接成一个Oligo
         dnaTable = {
@@ -424,7 +439,6 @@ class Splicing:
         oligo = self.gene[int(index_list[0][1]): int(index_list[0][2])]
         oligo_list = [['F_Primer', oligo]]  # 用于验证
         above_oligo_info = [['F_Primer', oligo, round(self.cal_tm(oligo), 2), '', len(oligo)]]
-
         for i in range(1, len(index_list)-1, 2):
             oligo = self.gene[int(index_list[i][1]): int(index_list[i+1][2])]
             index = int((i-1)/2)
@@ -442,8 +456,12 @@ class Splicing:
             below_oligo_info.append(['R{0}'.format(index), oligo, round(self.cal_tm(overlap), 2), len(overlap), len(oligo)])
         # 最后一片
         oligo = gene_complement[int(index_list[-1][1]): int(index_list[-1][2])][::-1]
+        # ???
         if self.tail:  # R_Primer避开添加上去的tail
-            oligo = gene_complement[self.gene_len_sor - self.primer_len: self.gene_len_sor][::-1]
+            # tail_len = index_list[-1][2] - self.gene_len_sor
+            # if tail_len < int(index_list[-1][2]) - int(index_list[-1][1]):
+            oligo = gene_complement[int(index_list[-2][1]): self.gene_len_sor][::-1]
+            print(oligo)
         oligo_list.append(['R_Primer', oligo])
         below_oligo_info.append(['R_Primer', oligo, round(self.cal_tm(oligo), 2), '', len(oligo)])
 
@@ -455,6 +473,18 @@ class Splicing:
         data = []
         for i in range(1, len(result)-1):
             data.append(result[i][2])
+
+        # # 只有得到data数组才能继续
+        if result[0][-1] >= self.primer_max_len:
+            oligo = self.get_primer(result[0][1], data)
+            oligo_list[0] = ['F_Primer', oligo]
+            result[0] = ['F_Primer', oligo, round(self.cal_tm(oligo), 2), '', len(oligo)]
+
+        if result[-1][-1] >= self.primer_max_len:
+            oligo = self.get_primer(result[-1][1], data)
+            oligo_list[-1] = ['R_Primer', oligo]
+            result[-1] = ['R_Primer', oligo, round(self.cal_tm(oligo), 2), '', len(oligo)]
+
         # overlap的信息
         overlap_data = {
             'min': round(min(data), 2),

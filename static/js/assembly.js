@@ -229,6 +229,7 @@ new Vue({
             that.output2 = false;
             that.arr = [];
             that.anotherArr = [];
+            formData.result = 'res1';
 
             if (that.dynamicValidateForm.pools == 1) {
                 axios.post("/assembly/", formData).then(function (response) {
@@ -302,7 +303,7 @@ new Vue({
                 formData.result = 'res2';
                 that.another_res = true;
 
-                if (that.dynamicValidateForm.pools === 1) {
+                if (that.dynamicValidateForm.pools == 1) {
                     axios.post("/assembly/", formData).then(function (response) {
                         that.anotherArr = response.data.arr;
                         that.anotherArr = that.test(that.anotherArr)

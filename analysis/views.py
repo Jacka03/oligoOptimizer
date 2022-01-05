@@ -27,10 +27,8 @@ class AssemblyView(View):
             data = json.loads(request.body)
             data = preprocessing_data(data)
 
-            start = time.time()
             splic = Splicing(data)
             next_cal, info = splic.cal()
-            end = time.time()
             # add to db
             # models.GeneInfo.objects.create(email=data['email'], gene_len=data['geneLen'], pools=data['pools'],
             #                                min_len=data['minLen'], max_len=data['maxLen'], assembly_time=end-start)
@@ -152,18 +150,9 @@ class AnalysisView(View):
             # 分析过程
             oligo_conc = next_cal[2] * 1e-9
             primer_conc = next_cal[3] * 1e-9
-            # print(temp)
             analy = Verification(next_cal[0], next_cal[1], oligo_conc, primer_conc)
-
-            start = time.time()
-
             analy_info = analy.get_strand_tube_all()
 
-            # analy_info = analy.analysis_two()
-            # mid = time.time()
-            # analy_info.update(analy.analysis_three())
-            end = time.time()
-            # print(end - start)
 
             # models.VerificationInfo.objects.create(cube_count=8000, gene_segment_count=next_cal[2],
             #                                        verification_two_time=mid-start, verification_three_time=end-mid)

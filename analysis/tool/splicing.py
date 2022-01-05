@@ -413,7 +413,7 @@ class Splicing:
         return tem_index, tem_tm
 
     def get_primer(self, oligo, data):
-        print(data)
+        # print(data)
         result = []
         for i in range(self.primer_min_len, self.primer_max_len):
             # 当oligo长度过长时

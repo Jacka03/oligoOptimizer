@@ -39,6 +39,8 @@ class Splicing:
         self.count = 20
 
         self.tail = False
+        self.primer_min_len = 18
+        self.primer_max_len = 22 + 1
 
     def cal_tm(self, temp_gene):
         """
@@ -560,12 +562,12 @@ class Splicing:
 
         index = int(cut_of_index[-1][2])
         while index < self.gene_len_sor:
+            self.tail = True
             tem_tm = []
             for i in cut_of_index:
                 tem_tm.append(i[-1])
             # if index != self.gene_len:
-            str = "CAGTTCCTGAAGATAGATTAAGGCACCGTGATGAACGTATGCACAGCTTCCGAAGGTGAGCCAGTGTGACTCTAAACAGATAAAACGAAAG"
-            self.gene = self.gene + str
+            self.gene = self.gene + "CAGTTCCTGAAGATAGATTAAGGCACCGTGATGAACGTATGCACAG"
             self.gene_len = len(self.gene)
             self.tail = True
 
@@ -590,7 +592,7 @@ class Splicing:
         for i in cut_of_index:
             tem_tm.append(i[-1])
 
-        str = "CAGTTCCTGAAGATAGATTAAGGCACCGTGATGAACGTATGCACAGCTTCCGAAGGTGAGCCAGTGTGACTCTAAACAGATAAAACGAAAG"
+        str = "CAGTTCCTGAAGATAGATTAAGGCACCGTGATGAACGTATGCACAGCTTCCGAAGG"
         self.gene = self.gene + str
         self.gene_len = len(self.gene)
         self.tail = True
@@ -609,33 +611,119 @@ class Splicing:
 
         return cut_of_index
 
+    def get_primer(self, oligo, data):
+        # print(data)
+        result = []
+        for i in range(self.primer_min_len, self.primer_max_len):
+            # 当oligo长度过长时
+            tem_data = data + [self.cal_tm(oligo[:i])]
+            result.append([i, np.std(tem_data)])
+            print((i, self.cal_tm(oligo[:i]), np.std(tem_data)))
+        # print(result)
+        result = self.choose(result)
+        oligo = oligo[:int(result[0][0])]
+
+        return oligo
+
+    def get_oligo(self, index_list):
+        # 将两个overlap拼接成一个Oligo
+        dnaTable = {
+            "A": "T", "T": "A", "C": "G", "G": "C"
+        }
+        gene_complement = ""  # DNA互补链
+        for ele in self.gene:
+            gene_complement += dnaTable[ele]
+
+        # 存储DNA双链上面的oligo
+        oligo = self.gene[int(index_list[0][1]): int(index_list[0][2])]
+        oligo_list = [['F_Primer', oligo]]  # 用于验证
+        above_oligo_info = [['F_Primer', oligo, round(self.cal_tm(oligo), 2), '', len(oligo)]]
+
+        for i in range(0, len(index_list) - 1, 2):
+            oligo = self.gene[int(index_list[i][1]): int(index_list[i + 1][2])]
+            index = int(i / 2)
+            oligo_list.append(['F{0}'.format(index), oligo])
+            overlap = self.gene[int(index_list[i][1]): int(index_list[i][2])]
+            above_oligo_info.append(
+                ['F{0}'.format(index), oligo, round(self.cal_tm(overlap), 2), len(overlap), len(oligo)])
+
+        # 存储DNA双链下面的oligo
+        below_oligo_info = []
+        for i in range(1, len(index_list) - 1, 2):
+            oligo = gene_complement[int(index_list[i][1]): int(index_list[i + 1][2])][::-1]  # 转化成从左到右是5'到3'
+            index = int((i - 1) / 2)
+            oligo_list.append(['R{0}'.format(index), oligo])
+            overlap = gene_complement[int(index_list[i][1]): int(index_list[i][2])][::-1]
+            below_oligo_info.append(
+                ['R{0}'.format(index), oligo, round(self.cal_tm(overlap), 2), len(overlap), len(oligo)])
+        # 最后一片
+        oligo = gene_complement[int(index_list[-1][1]): int(index_list[-1][2])][::-1]
+        # ???
+        if self.tail:  # R_Primer避开添加上去的tail
+            # tail_len = index_list[-1][2] - self.gene_len_sor
+            # if tail_len < int(index_list[-1][2]) - int(index_list[-1][1]):
+            oligo = gene_complement[self.gene_len_sor - self.max_len: self.gene_len_sor][::-1]
+            print(oligo)
+        oligo_list.append(['R_Primer', oligo])
+        below_oligo_info.append(['R_Primer', oligo, round(self.cal_tm(oligo), 2), '', len(oligo)])
+
+        result = []  # [[Label, oligo, tm, overlap_len, oligo_len], ]
+        for i in range(len(above_oligo_info)):
+            result.append(above_oligo_info[i])
+            result.append(below_oligo_info[i])
+
+        data = []
+        for i in range(1, len(result) - 1):
+            data.append(result[i][2])
+
+        # # 只有得到data数组才能继续
+        if result[0][-1] >= self.primer_max_len:
+            oligo = self.get_primer(result[0][1], data)
+            oligo_list[0] = ['F_Primer', oligo]
+            result[0] = ['F_Primer', oligo, round(self.cal_tm(oligo), 2), '', len(oligo)]
+
+        if result[-1][-1] >= self.primer_max_len:
+            oligo = self.get_primer(result[-1][1], data)
+            oligo_list[-1] = ['R_Primer', oligo]
+            result[-1] = ['R_Primer', oligo, round(self.cal_tm(oligo), 2), '', len(oligo)]
+
+        # overlap的信息
+        overlap_data = {
+            'min': round(min(data), 2),
+            'max': round(max(data), 2),
+            'range': round(max(data) - min(data), 2),
+            'mean': round(np.mean(data), 2),
+            'std': round(np.std(data), 2),
+
+            'result': result,
+        }
+        if self.tail:
+            # print(self.gene_len_sor, cut_of_index[-1][2])
+            print(index_list[-1][2])
+            overlap_data['tail'] = self.gene[self.gene_len_sor: int(index_list[-1][2])]
+
+        return overlap_data, oligo_list
+
     def cal(self):
         index, tm = self.cal_next_tm()
         # show_w(index, tm, "1")
         # index, tm = self.cal_next_tm(np.mean(tm))
-
-        # add tail
-        # if len(index) % 2 == 0:
-        #     index, tm = self.input_tail(index, tm)
 
         index = np.insert(index, 0, [0])
         index, tm = self.iteration(index, tm)
 
         # Gap or Gapless
         cut_of_index = self.return_result(index, tm)
-        # print(cut_of_index)
 
+        # 查看是否包含完整的链进去了
         cut_of_index = self.id_dna_complete(cut_of_index)
         # add tail
         if len(cut_of_index) % 2 == 0:
             cut_of_index = self.add_tail(cut_of_index)
 
-        res1, res2 = self.get_gene_list(cut_of_index)
-        info, primer = self.get_more_info(res1, res2, cut_of_index)
-
+        info, oligo = self.get_oligo(cut_of_index)
         # info for valification
-        next_cal = [res1, res2, len(cut_of_index), primer]
-        return next_cal, info
+        return oligo, info
 
     def cal_for_pool(self):
         _, tm = self.cal_next_tm()
@@ -656,11 +744,9 @@ class Splicing:
 
         cut_of_index = self.return_result(index, tm)
 
-        res1, res2 = self.get_gene_list(cut_of_index)
-        info, primer = self.get_more_info(res1, res2, cut_of_index)
-
-        next_cal = [res1, res2, len(cut_of_index), primer]
-        return next_cal, info
+        info, oligo = self.get_oligo(cut_of_index)
+        # info for valification
+        return oligo, info
 
 
 if __name__ == '__main__':

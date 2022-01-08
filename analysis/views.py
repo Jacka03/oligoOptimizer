@@ -39,7 +39,8 @@ class AssemblyView(View):
             context = {
                 'info': info.get('result'),
                 'resInfo': tem_res,
-                'nextCal': next_cal
+                'nextCal': next_cal,
+                'tail_reverse': info.get('tail_reverse')
             }
             # print(context)
             if data.get('verification') == 'Yes':

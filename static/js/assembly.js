@@ -89,6 +89,12 @@ new Vue({
 
     created() {
         // {#this.calGeneLength();#}
+        this.dynamicValidateForm.email = '758168660@qq.com';
+        this.dynamicValidateForm.geneDesc = 'description';
+        this.dynamicValidateForm.geneName = 'name';
+        this.dynamicValidateForm.gene = 'taagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacagttgcgcagcctgaataataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata';
+        // this.dynamicValidateForm.gene = 'taagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggtaagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacataagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccggttgcgcagcctgaataataacgctaagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagctgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaactgggcctttcgttttat';
+        this.dynamicValidateForm.geneLen = this.dynamicValidateForm.gene.length;
     },
 
     methods: {
@@ -101,31 +107,17 @@ new Vue({
 
         test(resArr) {
             // view tail
-
             source = resArr[resArr.length - 1];
-            // {#TODO#}
-            if (source.resInfo[5] != undefined) {
-                // console.log(source.resInfo[5])
-                var tail = source.resInfo[5].value
-                // tail = tail.split("").reverse().join("")
-                // endTail = "";
-                // for (var i = 0; i < tail.length; i++) {
-                //     if (tail[i] == 'A') {
-                //         endTail += 'T';
-                //     } else if (tail[i] == 'T') {
-                //         endTail += 'A';
-                //     } else if (tail[i] == 'C') {
-                //         endTail += 'G';
-                //     } else if (tail[i] == 'G') {
-                //         endTail += 'C';
-                //     }
-                // }
+            var tail = source["tail_reverse"];
+            if (tail.length > 0) {
+                // console.log(tail);
                 replaceStr = '<span style="color:red;">' + tail + '</span>';
-                index = resArr[resArr.length - 1]["info"].length - 2;
-                str = resArr[resArr.length - 1]["info"][index][1];
-                // str = str.replace(tail, replaceStr);
-                str = str.substring(0, str.lastIndexOf(tail)) + replaceStr
-                resArr[resArr.length - 1]["info"][index][1] = str;
+                index = source["info"].length - 3;
+                str = source["info"][index][1];
+                str = str.replace(tail, replaceStr);
+                // str = str.substring(0, str.lastIndexOf(tail)) + replaceStr
+
+                source["info"][index][1] = str;
             }
             return resArr;
         },

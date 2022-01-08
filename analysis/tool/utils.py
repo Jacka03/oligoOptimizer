@@ -1,7 +1,7 @@
 
 
 def reverse_comple(seq):
-    # 获取seq反向序列
+    # 获取seq
     seq = seq[::-1]
     dnaTable = {
         "A": "T", "T": "A", "C": "G", "G": "C"
@@ -58,6 +58,7 @@ def get_res_info(info):
 
     if info.get('tail'):
         res_info['tail'] = info.get('tail')
+        # res_info['tail_reverse'] = info.get('tail_reverse')
 
     tem_res = []
     for key, value in res_info.items():

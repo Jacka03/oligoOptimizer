@@ -598,7 +598,6 @@ class Splicing:
             overlap_data['tail'] = self.gene[self.gene_len_sor: int(index_list[-1][2])]
             overlap_data['tail_reverse'] = gene_complement[self.gene_len_sor: int(index_list[-1][2])][::-1]
 
-
         return overlap_data, oligo_list
 
     def cal(self):

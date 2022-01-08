@@ -21,9 +21,9 @@ new Vue({
                 minLen: 20,
                 maxLen: 30,
                 pools: 1,
-                temperature: 37,
-                oligoConc: 10,
-                primerConc: 400,
+                temperature: 54,
+                oligoConc: 100,
+                primerConc: 100,
 
                 // concentrations: 1,
 
@@ -151,7 +151,7 @@ new Vue({
             if (res == 'res2') {
                 input = that.anotherArr;
             }
-            console.log(input);
+            // console.log(input);
             // {#console.log(this.arr);#}
             axios.post("/download/", input, {responseType: 'blob'}).then(function (response) {
                 // {#console.log(response);#}

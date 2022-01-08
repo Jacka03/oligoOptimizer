@@ -21,11 +21,11 @@ class Verification:
         # 获取试管中只有两条基因片段的所有情况
 
         strands = {}
-        for i in range(1, len(self.oligo)-1):
+        for i in range(len(self.oligo)-2):
             strands[Strand(self.oligo[i][1], name=self.oligo[i][0])] = self.oligo_conc
 
-        strands[Strand(self.oligo[0][1], name=self.oligo[0][0])] = self.primer_conc
         strands[Strand(self.oligo[-1][1], name=self.oligo[-1][0])] = self.primer_conc
+        strands[Strand(self.oligo[-2][1], name=self.oligo[-2][0])] = self.primer_conc
 
         my_model = Model(material='dna', celsius=self.temp)
         t = Tube(strands=strands, complexes=SetSpec(max_size=2), name='t')  # complexes defaults to [A, B]
@@ -36,7 +36,8 @@ class Verification:
             all_conc[my_complex.name] = conc  # 反应后每个试管中DNA的浓度
         all_conc = sorted(all_conc.items(), key=lambda d: d[1], reverse=True)  # 排序
 
-        print(all_conc)
+        # print(all_conc)
+        # F last one
         above_oligo_count = int(len(self.oligo)/2) - 2
         tem_char = 'F{0}'.format(above_oligo_count)
 
@@ -47,32 +48,31 @@ class Verification:
 
                 t1 = tem_split[0][1:]
                 t2 = tem_split[1][1:]
-                # print(t1, t2)
-                # print(t1.isdigit(), t2.isdigit())
 
-                if not t1.isdigit() and not t2.isdigit() and val > self.primer_check_conc:
-                    # primer + pirmer
-                    error['{0}, {1}'.format(tem_split[0], tem_split[1])] = val
+                if not t1.isdigit() and not t2.isdigit():
+                    if val > self.primer_check_conc:
+                        # primer + pirmer
+                        error['{0}, {1}'.format(tem_split[0], tem_split[1])] = val
 
                 elif not t1.isdigit():
                     # primer + x, x + primer
-                    if tem_split[0][0] == 'F' and tem_split[1] != 'R0':
+                    if tem_split[0][0] == 'R' and tem_split[1] != tem_char:
                         error['{0}, {1}'.format(tem_split[0], tem_split[1])] = val
-                    elif tem_split[0][0] == 'R' and tem_split[1] != tem_char:
+                    elif tem_split[0][0] == 'F':
                         error['{0}, {1}'.format(tem_split[0], tem_split[1])] = val
 
                 elif not t2.isdigit():
-                    if tem_split[1][0] == 'F' and tem_split[0] != 'R0':
+                    if tem_split[1][0] == 'R' and tem_split[0] != tem_char:
                         error['{0}, {1}'.format(tem_split[0], tem_split[1])] = val
-                    elif tem_split[1][0] == 'R' and tem_split[0] != tem_char:
+                    elif tem_split[1][0] == 'F':
                         error['{0}, {1}'.format(tem_split[0], tem_split[1])] = val
 
                 elif tem_split[0][0] == tem_split[1][0]:  # 错配
                     # Rx+Rx ; Fx+Fx
                     error['{0}, {1}'.format(tem_split[0], tem_split[1])] = val
-                elif tem_split[0][0] == 'F' and int(t1) - int(t2) not in [0, -1]:
+                elif tem_split[0][0] == 'F' and int(t1) - int(t2) not in [0, 1]:
                     error['{0}, {1}'.format(tem_split[0], tem_split[1])] = val
-                elif tem_split[0][0] == 'R' and int(t1) - int(t2) not in [0, 1]:
+                elif tem_split[0][0] == 'R' and int(t1) - int(t2) not in [0, -1]:
                     error['{0}, {1}'.format(tem_split[0], tem_split[1])] = val
             # 判断条件有待改进
             elif val < self.oligo_check_conc:  #

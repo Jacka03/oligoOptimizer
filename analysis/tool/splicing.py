@@ -622,23 +622,25 @@ class Splicing:
         return oligo, info
 
     def cal_for_pool(self):
-        _, tm = self.cal_next_tm()
-        index, tm = self.cal_next_tm(np.mean(tm))
+        index, tm = self.cal_next_tm()
+        # index, tm = self.cal_next_tm(np.mean(tm))
         index = [int(i) for i in index]
         return index, tm  # TODO
 
     def cal_for_each_pool(self, index, tm):
-        # add tail
-        if len(index) % 2 == 0:
-            # print(len(index), index[-1])
-            index, tm = self.input_tail(index, tm)
-            # print(len(index), index[-1])
 
         # 对整体遍历
         index = np.insert(index, 0, [0])
         index, tm = self.iteration(index, tm)
 
+        # Gap or Gapless
         cut_of_index = self.return_result(index, tm)
+
+        # 查看是否包含完整的链进去了
+        cut_of_index = self.id_dna_complete(cut_of_index)
+        # add tail
+        if len(cut_of_index) % 2 == 0:
+            cut_of_index = self.add_tail(cut_of_index)
 
         info, oligo = self.get_oligo(cut_of_index)
         # info for valification

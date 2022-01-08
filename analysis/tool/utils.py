@@ -68,3 +68,11 @@ def get_res_info(info):
         }
         tem_res.append(tem)
     return tem_res
+
+
+if __name__ == '__main__':
+    print(round(4.4))
+    print(round(4.50))
+    print(round(4.55))
+    print(round(4.7))
+    pass

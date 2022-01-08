@@ -21,9 +21,9 @@ new Vue({
                 minLen: 20,
                 maxLen: 30,
                 pools: 1,
-                temperature: 54,
-                oligoConc: 100,
-                primerConc: 100,
+                temperature: 37,
+                oligoConc: 10,
+                primerConc: 400,
 
                 // concentrations: 1,
 

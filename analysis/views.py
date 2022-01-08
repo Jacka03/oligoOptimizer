@@ -1,19 +1,15 @@
-import json
-import time
 import io
+import json
 import re
 
 import pandas as pd
-
 from django.http import JsonResponse, Http404, HttpResponse
-from django.shortcuts import render, redirect
-
+from django.shortcuts import render
 # Create your views here.
 from django.views import View
 
-from analysis import models
 from analysis.tool.splicing import Splicing
-from analysis.tool.utils import is_dna, reverse_comple, preprocessing_data, get_res_info
+from analysis.tool.utils import preprocessing_data, get_res_info
 from analysis.tool.verification import Verification
 
 
@@ -82,33 +78,39 @@ class AssemblyPoolsView(View):
             pools = int(data['pools'])
             # print("pools:{0}".format(pools))
             splic = Splicing(data)
-            start = time.time()
 
             index, tm = splic.cal_for_pool()
 
             # overlap of each pool
-            each_pool = int(len(index) / pools)
-            each_pool = each_pool + 1 if each_pool % 2 == 0 else each_pool
+            each_pool = round((len(index) - 1) / pools)
+            each_pool = [each_pool + 1, each_pool + 1] if each_pool % 2 == 0 else [each_pool, each_pool+2]
+
+            # each_pool = each_pool + 1 if each_pool % 2 == 0 else each_pool
             # print("after pools:{0}".format(each_pool))
 
             gene = data['gene']
-            # print("gene:{0}".format(len(gene)))
             arr = []
+            left = 0
             for i in range(pools):
+                right = left + each_pool[i % 2]
+
                 if i == 0:
-                    index_list = index[i * each_pool: (i + 1) * each_pool]
+                    index_list = index[left: right]
                     gene_list = gene[0: index_list[-1]]
-                    tm_list = tm[i * each_pool: (i + 1) * each_pool]
+                    tm_list = tm[left: right]
+
                 elif i == pools - 1:
-                    index_list = index[(pools - 1) * each_pool: -1]
-                    gene_list = gene[index[(pools - 1) * each_pool - 1]: len(gene)]
-                    index_list = [x - index[(pools - 1) * each_pool - 1] for x in index_list]
-                    tm_list = tm[(pools - 1) * each_pool: -1]
+                    index_list = index[left: right]
+                    gene_list = gene[index[left - 1]: len(gene)]
+                    index_list = [x - index[left - 1] for x in index_list]
+                    tm_list = tm[left: right]
                 elif i > 0:
-                    index_list = index[i * each_pool: (i + 1) * each_pool]
-                    gene_list = gene[index[i * each_pool - 1]: index_list[-1]]
-                    index_list = [x - index[i * each_pool - 1] for x in index_list]
-                    tm_list = tm[i * each_pool: (i + 1) * each_pool]
+                    index_list = index[left: right]
+                    gene_list = gene[index[left - 1]: index_list[-1]]
+                    index_list = [x - index[left - 1] for x in index_list]
+                    tm_list = tm[left: right]
+
+                left = right - 1
 
                 data['gene'] = gene_list
 
@@ -122,6 +124,8 @@ class AssemblyPoolsView(View):
                     'info': info.get('result'),
                     'resInfo': tem_res,
                     'nextCal': next_cal,
+                    'tail_reverse': info.get('tail_reverse'),
+
                     'temperature': data['temperature'],
                     'oligoConc': data['oligoConc'],
                     'primerConc': data['primerConc']

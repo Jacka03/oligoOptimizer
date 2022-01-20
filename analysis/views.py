@@ -1,6 +1,7 @@
 import io
 import json
 import re
+import time
 
 import pandas as pd
 from django.http import JsonResponse, Http404, HttpResponse
@@ -8,6 +9,7 @@ from django.shortcuts import render
 # Create your views here.
 from django.views import View
 
+from analysis import models
 from analysis.tool.splicing import Splicing
 from analysis.tool.utils import preprocessing_data, get_res_info
 from analysis.tool.verification import Verification
@@ -24,10 +26,12 @@ class AssemblyView(View):
             data = preprocessing_data(data)
 
             splic = Splicing(data)
+            start = time.time()
             next_cal, info = splic.cal()
+            end = time.time()
             # add to db
-            # models.GeneInfo.objects.create(email=data['email'], gene_len=data['geneLen'], pools=data['pools'],
-            #                                min_len=data['minLen'], max_len=data['maxLen'], assembly_time=end-start)
+            models.GeneInfo.objects.create(email=data['email'], gene_len=data['geneLen'], pools=data['pools'],
+                                           min_len=data['minLen'], max_len=data['maxLen'], assembly_time=end-start)
 
             # add cal info to context
             tem_res = get_res_info(info)
@@ -36,7 +40,8 @@ class AssemblyView(View):
                 'info': info.get('result'),
                 'resInfo': tem_res,
                 'nextCal': next_cal,
-                'tail_reverse': info.get('tail_reverse')
+                'tail_reverse': info.get('tail_reverse'),
+                'above_tail': info.get('above_tail')
             }
             # print(context)
             if data.get('verification') == 'Yes':
@@ -78,7 +83,7 @@ class AssemblyPoolsView(View):
             pools = int(data['pools'])
             # print("pools:{0}".format(pools))
             splic = Splicing(data)
-
+            start = time.time()
             index, tm = splic.cal_for_pool()
 
             # overlap of each pool
@@ -125,15 +130,16 @@ class AssemblyPoolsView(View):
                     'resInfo': tem_res,
                     'nextCal': next_cal,
                     'tail_reverse': info.get('tail_reverse'),
+                    'above_tail': info.get('above_tail'),
 
                     'temperature': data['temperature'],
                     'oligoConc': data['oligoConc'],
                     'primerConc': data['primerConc']
                 }
                 arr.append(context)
-            # end = time.time()
-            # models.GeneInfo.objects.create(email=data['email'], gene_len=data['geneLen'], pools=data['pools'],
-            #                                min_len=data['minLen'], max_len=data['maxLen'], assembly_time=end-start)
+            end = time.time()
+            models.GeneInfo.objects.create(email=data['email'], gene_len=data['geneLen'], pools=data['pools'],
+                                           min_len=data['minLen'], max_len=data['maxLen'], assembly_time=end-start)
 
             context = {'arr': arr}
         except Exception as err:
@@ -188,6 +194,7 @@ class DownloadView(View):  # 导出excel数据
             # print(re.sub(r'<(.*?)>', r'', tem[-1]['info'][-3][1], count=2))
             # tem = re.sub(r'<(.*?)>', r'', tem[-1]['info'][-3][1], count=2)
             tem[-1]['info'][-3][1] = re.sub(r'<(.*?)>', r'', tem[-1]['info'][-3][1], count=2)
+            tem[-1]['info'][-4][1] = re.sub(r'<(.*?)>', r'', tem[-1]['info'][-4][1], count=2)
             # tem[-1]['info'][-3][1] == tem[-1]['info'][-3][1].replace()
         return tem
 

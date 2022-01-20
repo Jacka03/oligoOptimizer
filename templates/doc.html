@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>home</title>
     <link rel="stylesheet" href="../static/element-ui/lib/theme-chalk/index.css">
+    {#<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">#}
     <link rel="stylesheet" href="../static/css/main.css">
     <link rel="stylesheet" href="../static/css/assembly.css">
 
@@ -13,7 +14,7 @@
     <el-container>
         <el-main>
             <div class="head-style font-style">
-                OligoOptimizer
+                OligoTmOptimizer
             </div>
 
             <div class="menu-style">
@@ -43,50 +44,56 @@
                 <div id="show" class="main-height main-style"
                      style="background-color: white;">
 
-                    <div style="margin: 30px;" >
+                    <div style="margin: 30px;">
                         <p>
-                            <b>Email Address:</b> required.
+                        <b>Email Address:</b> required.
                         </p>
                         <p>
-                            <b>Gene Information:</b> Input 'DNA seq' from 5' to 3' end. Length Range from 0.1 to 100 kbp. The
+                            <b>Gene Information: </b>Input 'DNA seq' from 5' to 3' end. Length Range from 0.1 to 100 kbp. The
                             'DNA
                             seq' is required and the other items is optional.
-
                         </p>
                         <p>
-                            <b>Parameters For Gene Synthesis:</b> Parameters for real time PCR assembling.
-
+                            <b>Parameters For Gene Synthesis: </b>Parameters for real time PCR assembling.
                         </p>
                         <p>
-                            <b>Overlap Length:</b> Users can tune this parameter to change the length of overlap between oligos
+                            <b>Overlap Length: </b>Users can tune this parameter to change the length of overlap between oligos
                             and
                             output different oligonucleotide sets. Default parameter minimum 20bp and maximum 30bp will
                             produce oligo overlap length range from 16bp to 34bp.
-
                         </p>
                         <p>
-                            <b>Result Type:</b> Users can select 'Gapless' or 'Gap' oligo set for PCR assembly. When selecting
-                        'Gap', the outputted oligonucleotide sets with gap between consecutive oligonucleotides possess
+                            <b>Result Type: </b>Users can select 'Gapless' or 'Gap' oligo set for PCR assembly. When selecting
+                            'Gap', the outputted oligonucleotide sets with gap between consecutive oligonucleotides
+                            possess
                             more uniform melting temperature. The outputted gapless oligonucleotide sets also can be
                             used
-                            for LCR-based gene synthesis.
-
+                            for LCR-based gene synthesis. Furthermore, users can slect 'another result' option in the
+                            output
+                            'Result' tab to get alternative oligo set, which is segmented from 3' end of input sequence.
+                            In
+                            some circumstances, a small tail may be added to the given sequence automatically by the
+                            program. The tail will be highlighted in red in the final result. It can be eliminated in
+                            PCR
+                            reaction by using the given primers.
                         </p>
                         <p>
-                            <b>Long DNA Assembly(optional):</b> Sequence will be partitioned into # of pools of
-                            oligodeoxynucleotides with homologous melting temperature for long sequence.
-
+                            <b>Long DNA Assembly(optional): </b>Sequence will be partitioned into # of pools of
+                            oligodeoxynucleotides with homologous melting temperature for long sequence. The last
+                            oligodeoxynucleotide in the previous pool has overlap region range from 16bp to 34bp with
+                            the
+                            first oligodeoxynucleotide in the next pool.
                         </p>
-
                         <p>
-                            <b>Is Verification Required:</b> Analyse the mismatches between oligonucleotides based on
+                            <b>Is Verification Required: </b>Analyse the mismatches between oligonucleotides based on
                             thermodynamic
                             processes and provide the concentration of potential mismatches. It will analyse the
                             potential
-                            mismatches between any oligonucleotide couples and triplets and present the mismatches and
+                            mismatches between any oligonucleotide couples and present the potential mismatches and
                             their
-                            concentration above ten percent of input concentration.
-
+                            concentration. If 'Yes' option is slected, users can determine the temperature,
+                            concentration of
+                            oligos for mismatch analysis.
                         </p>
                     </div>
                 </div>
@@ -100,9 +107,16 @@
 </body>
 
 <script src="../static/js/vue.js"></script>
+
 <script src="../static/js/axios-0.18.0.js"></script>
+{#<script src="https://cdn.bootcdn.net/ajax/libs/axios/0.18.0/axios.js"></script>#}
+
 <script src="../static/js/jquery.min.js"></script>
+{#<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>#}
+
+{#<script src="https://unpkg.com/element-ui/lib/index.js"></script>#}
 <script src="../static/element-ui/lib/index.js"></script>
+
 <script src="../static/js/assembly.js"></script>
 
 </html>

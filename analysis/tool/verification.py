@@ -36,7 +36,7 @@ class Verification:
             all_conc[my_complex.name] = conc  # 反应后每个试管中DNA的浓度
         all_conc = sorted(all_conc.items(), key=lambda d: d[1], reverse=True)  # 排序
 
-        # print(all_conc)
+        print(all_conc)
         # F last one
         above_oligo_count = int(len(self.oligo)/2) - 2
         tem_char = 'F{0}'.format(above_oligo_count)

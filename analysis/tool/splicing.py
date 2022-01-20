@@ -41,7 +41,7 @@ class Splicing:
         self.tail = False
         self.above_tail = 0
         self.primer_min_len = 18
-        self.primer_max_len = 22 + 1
+        self.primer_max_len = 24 + 1
 
     def cal_tm(self, temp_gene):
         """
@@ -588,8 +588,11 @@ class Splicing:
             print(self.gene, self.min_len, self.max_len)
             raise Exception
 
+        overlap_data['above_tail'] = ''
         if self.above_tail == 2:
             print(self.gene[self.gene_len_sor: int(index_list[-2][2])])
+            # atgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacagttgcgcagcctgaataataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgg
+            overlap_data['above_tail'] = self.gene[self.gene_len_sor: int(index_list[-2][2])]
 
         overlap_data['tail_reverse'] = ''
         if self.tail:
@@ -647,12 +650,12 @@ class Splicing:
         return oligo, info
 
 
-if __name__ == '__main__':
-    data = {'email': '758168660@qq.com', 'geneLen': 638, 'result': 'res1', 'minLen': 20, 'maxLen': 30,
-            'resultType': 'Gap', 'verification': 'No', 'pools': 1, 'geneName': 'name', 'geneDesc': 'description',
-            'temperature': 37, 'concentrations': 1, 'gene': 'atgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacagttgcgcagcctgaataataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctt', 'K': 50, 'Mg': 8, 'dNTPs': 4, 'Tris': 10, 'oligo': 10, 'primer': 400, 'Na': 1.2}
-    data['gene'] = data['gene'].upper()
-    sp = Splicing(data)
-    next_cal, info = sp.cal()
-    print(info)
+# if __name__ == '__main__':
+#     data = {'email': '758168660@qq.com', 'geneLen': 638, 'result': 'res1', 'minLen': 20, 'maxLen': 30,
+#             'resultType': 'Gap', 'verification': 'No', 'pools': 1, 'geneName': 'name', 'geneDesc': 'description',
+#             'temperature': 37, 'concentrations': 1, 'gene': 'atgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacagttgcgcagcctgaataataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctt', 'K': 50, 'Mg': 8, 'dNTPs': 4, 'Tris': 10, 'oligo': 10, 'primer': 400, 'Na': 1.2}
+#     data['gene'] = data['gene'].upper()
+#     sp = Splicing(data)
+#     next_cal, info = sp.cal()
+#     print(info)
     # taagc

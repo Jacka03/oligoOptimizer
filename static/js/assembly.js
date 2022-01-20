@@ -21,9 +21,9 @@ new Vue({
                 minLen: 20,
                 maxLen: 30,
                 pools: 1,
-                temperature: 37,
-                oligoConc: 10,
-                primerConc: 400,
+                temperature: 54,
+                oligoConc: 100,
+                primerConc: 100,
 
                 // concentrations: 1,
 
@@ -89,25 +89,26 @@ new Vue({
 
     created() {
         // {#this.calGeneLength();#}
-        this.dynamicValidateForm.email = '758168660@qq.com';
-        this.dynamicValidateForm.geneDesc = 'description';
-        this.dynamicValidateForm.geneName = 'name';
-        this.dynamicValidateForm.gene = 'taagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacagttgcgcagcctgaataataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata';
-        // this.dynamicValidateForm.gene = 'taagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggtaagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacataagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccggttgcgcagcctgaataataacgctaagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagctgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaactgggcctttcgttttat';
-        this.dynamicValidateForm.geneLen = this.dynamicValidateForm.gene.length;
+        // this.dynamicValidateForm.email = '758168660@qq.com';
+        // this.dynamicValidateForm.geneDesc = 'description';
+        // this.dynamicValidateForm.geneName = 'name';
+        // this.dynamicValidateForm.gene = 'taagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacagttgcgcagcctgaataataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata';
+        // // this.dynamicValidateForm.gene = 'taagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggtaagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacataagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccggttgcgcagcctgaataataacgctaagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagctgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaactgggcctttcgttttat';
+        // this.dynamicValidateForm.geneLen = this.dynamicValidateForm.gene.length;
     },
 
     methods: {
         handleSelect(key, keyPath) {
             // var that = this;
             this.activeIndex = key;
-            console.log(this.activeIndex);
+            // console.log(this.activeIndex);
             // this.$emit.activeIndex = key;
         },
 
         test(resArr) {
             // view tail
             source = resArr[resArr.length - 1];
+            // console.log(source)
             var tail = source["tail_reverse"];
             if (tail.length > 0) {
                 // console.log(tail);
@@ -119,6 +120,19 @@ new Vue({
 
                 source["info"][index][1] = str;
             }
+
+            var above_tail = source["above_tail"];
+            if (above_tail.length > 0) {
+                // console.log(above_tail);
+                replaceStr = '<span style="color:red;">' + above_tail + '</span>';
+                index = source["info"].length - 4;
+                str = source["info"][index][1];
+                str = str.replace(above_tail, replaceStr);
+                // str = str.substring(0, str.lastIndexOf(tail)) + replaceStr
+
+                source["info"][index][1] = str;
+            }
+
             return resArr;
         },
 
@@ -281,7 +295,7 @@ new Vue({
                 alert(error);
                 that.verificationLoading = false;
                 that.loading = false;
-                console.log(error);
+                // console.log(error);
             });
 
         },

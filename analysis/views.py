@@ -47,6 +47,10 @@ class AssemblyView(View):
             if data.get('verification') == 'Yes':
                 oligo_conc = data['oligoConc'] * 1e-9
                 primer_conc = data['primerConc'] * 1e-9
+
+                if primer_conc == 0 or primer_conc == 0.:
+                    primer_conc = oligo_conc
+                    
                 # 分析过程
                 analy = Verification(next_cal, data['temperature'], oligo_conc, primer_conc)
 

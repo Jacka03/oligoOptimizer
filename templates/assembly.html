@@ -8,7 +8,9 @@
     <link rel="stylesheet" href="../static/css/main.css">
     <link rel="stylesheet" href="../static/css/assembly.css">
 
+
 </head>
+
 <body>
 <div id="app" style="width: 1024px; margin: auto;">
     <el-container>
@@ -210,7 +212,7 @@
 
                                 </div>
 
-                                <h3>Is Verification Required</h3>
+                                <h3>Mis-hybridziation Analysis and Verification</h3>
                                 <el-form-item prop="verification">
                                     <el-radio style="width: 76px" v-model="dynamicValidateForm.verification "
                                               label="No">No
@@ -222,14 +224,18 @@
                                 <div v-if="dynamicValidateForm.verification == 'Yes'">
                                     <el-form-item
                                             size="small"
-                                            style="margin-left: 0px; ">
+                                            style="margin-left: 0px; "
+                                            id="annealingTemp"
 
-                                            <el-form-item prop="temperature"
-                                                          label="temperature:"
-                                                          class="el-form-item_line"
-                                                          required>
-                                                <el-input class="input_number"
-                                                          size="small"
+                                    >
+
+                                        <el-form-item prop="temperature"
+                                                      label="annealing temperature:"
+                                                      class="el-form-item_line"
+                                                      required
+                                        >
+                                            <el-input class="input_number"
+                                                      size="small"
                                                           type='number'
                                                           v-model.number="dynamicValidateForm.temperature"></el-input>
                                                 &#8451;
@@ -656,6 +662,8 @@
 </div>
 
 </body>
+
+
 
 <script src="../static/js/vue.js"></script>
 

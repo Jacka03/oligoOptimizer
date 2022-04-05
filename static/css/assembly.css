@@ -29,3 +29,7 @@
 .el-form-item_line {
     margin-left: -37px;
 }
+
+#annealingTemp  .el-form-item__label {
+    width: 190px ! important;
+}

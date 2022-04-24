@@ -26,6 +26,11 @@ def get_tableData(data_list):
     tableData = {}
     for data in data_list:
         tableData[data['name']] = data['data']
+
+    if tableData['primer'] == 0 or tableData['primer'] == 0.:
+        print(tableData['primer'])
+        tableData['primer'] = tableData['oligo']
+
     # tableData['Na'] = 1.2
     return tableData
 

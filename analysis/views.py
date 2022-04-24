@@ -49,6 +49,7 @@ class AssemblyView(View):
                 primer_conc = data['primerConc'] * 1e-9
 
                 if primer_conc == 0 or primer_conc == 0.:
+                    print(primer_conc)
                     primer_conc = oligo_conc
                     
                 # 分析过程
@@ -165,9 +166,13 @@ class AnalysisView(View):
             # 分析过程
             oligo_conc = next_cal[2] * 1e-9
             primer_conc = next_cal[3] * 1e-9
+
+            if primer_conc == 0 or primer_conc == 0.:
+                print(primer_conc)
+                primer_conc = oligo_conc
+
             analy = Verification(next_cal[0], next_cal[1], oligo_conc, primer_conc)
             analy_info = analy.get_strand_tube_all()
-
 
             # models.VerificationInfo.objects.create(cube_count=8000, gene_segment_count=next_cal[2],
             #                                        verification_two_time=mid-start, verification_three_time=end-mid)

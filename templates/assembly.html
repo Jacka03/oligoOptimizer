@@ -154,7 +154,16 @@
                                                               type='number'
                                                               v-model.number="scope.row.data">
                                                     </el-input>
-                                                    {[ scope.row.unit ]}
+                                                    {[ scope.row.unit ]} &nbsp;&nbsp;
+
+                                                    <el-popover v-if="scope.row.info != ''"
+                                                        placement="top-start"
+                                                        {#title="标题"#}
+                                                        width="300"
+                                                        trigger="hover">
+                                                         {[scope.row.info]}
+                                                        <i class="el-icon-info" slot="reference"></i>
+                                                      </el-popover>
 
                                                 </el-form-item>
                                             </template>
@@ -225,7 +234,6 @@
                                             size="small"
                                             style="margin-left: 0px; "
                                             id="annealingTemp"
-
                                     >
 
                                         <el-form-item prop="temperature"
@@ -377,11 +385,11 @@
                                 </div>
 
                                 <div
-                                        style="margin-left: 100px; margin-top: 40px;"
-                                        v-if="dynamicValidateForm.pools > 1
-                                        && dynamicValidateForm.verification == 'Yes'
-                                        && item_i.analyInfo == null"
-                                        v-loading="verificationLoading"
+                                    style="margin-left: 100px; margin-top: 40px;"
+                                    v-if="dynamicValidateForm.pools > 1
+                                    && dynamicValidateForm.verification == 'Yes'
+                                    && item_i.analyInfo == null"
+                                    v-loading="verificationLoading"
                                 >
                                     <el-form>
                                         <el-form-item

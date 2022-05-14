@@ -42,7 +42,7 @@ new Vue({
                         data: 8,
                         ion: 'Mg<sup>2+</sup> (1-1000mM)',
                         unit: 'mM',
-                        info: 'The Mg-dNTP association constant is sufficiently large(50) that the free Magnesium ion concentration can be approximated simply by the difference between the total magnesium concentration and the concentration of dNTPs.',
+                        info: 'The Mg-dNTP association constant is sufficiently large that the free Magnesium ion concentration can be approximated simply by the difference between the total magnesium concentration and the concentration of dNTPs.',
                     }, {
                         name: 'dNTPs',
                         data: 4,
@@ -64,7 +64,7 @@ new Vue({
                     }, {
                         name: 'primer',
                         data: 400,
-                        ion: 'primer (0.1-1000nM)',
+                        ion: 'primer (0-1000nM)',
                         unit: 'nM',
                         info: '',
                     }],
@@ -217,23 +217,85 @@ new Vue({
             this.$refs[formName].resetFields();
         },
 
-        submitForm(formData) {
-            if (this.dynamicValidateForm.email == null) {
+        testData(formData) {
+            // email
+            if (formData.email == null) {
                 this.$message({
                         message: 'Please enter your email address',
-                        type: "warning"
+                        type: "error"
                     }
                 );
+                return false;
+            }
+
+            // gene
+            if (formData.gene == null) {
+                this.$message({
+                    message: 'please enter the gene seq',
+                    type: "error"
+                });
+                return false;
+            }
+
+            // overlap
+            if (formData.minLen <= 0 || formData.minLen >= formData.maxLen || formData.maxLen >= formData.geneLen) {
+                this.$message({
+                    message: 'overlap length error ',
+                    type: "error"
+                });
+                return false;
+            }
+
+            // Parameters
+            for (let i = 0; i < 4; i++) {
+                if (formData.tableData[i].data < 1 || formData.tableData[i].data > 1000) {
+                    this.$message({
+                        message: formData.tableData[i].name + ' ion concentration',
+                        type: "error"
+                    });
+                    return false;
+                }
+            }
+            if (formData.tableData[4].data < 0.1 || formData.tableData[4].data > 1000) {
+                this.$message({
+                    message: formData.tableData[4].name + ' ion concentration',
+                    type: "error"
+                });
+                return false;
+            }
+            if (formData.tableData[5].data < 0 || formData.tableData[5].data > 1000) {
+                this.$message({
+                    message: formData.tableData[5].name + ' ion concentration',
+                    type: "error"
+                });
+                return false;
+            }
+            if (formData.tableData[1].data - formData.tableData[2].data <= 0) {
+                this.$message({
+                    message: 'Magnesium ion concentration',
+                    type: "error"
+                });
+                return false;
+            }
+
+            // pools
+            if (formData.pools <= 0) {
+                this.$message({
+                    message: 'pools error ',
+                    type: "error"
+                });
+                return false;
+            }
+
+            return true
+        },
+
+        submitForm(formData) {
+
+            if(!this.testData(formData)) {
                 return;
             }
 
-            if (this.dynamicValidateForm.gene == null) {
-                this.$message({
-                    message: 'please enter the gene seq',
-                    type: "warning"
-                });
-                return;
-            }
             var that = this;
             // {#console.log(formData);#}
             that.loading = true;

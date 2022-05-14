@@ -94,7 +94,6 @@ class Splicing:
         # TODO 当premer不是远大于oligo时，c_t需要重新计算
 
         # TODO Mon离子浓度初始化
-        # c_Mon = 0.005
         c_Mon = c_K + c_Tris  # + c_Na
         c_Mg = c_Mg - c_dNTPs
 

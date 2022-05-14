@@ -30,6 +30,12 @@ def get_tableData(data_list):
     if tableData['primer'] == 0 or tableData['primer'] == 0.:
         print(tableData['primer'])
         tableData['primer'] = tableData['oligo']
+    elif tableData['primer'] < 100 * tableData['oligo']:
+        # TODO why 100?
+        tableData['primer'] = tableData['primer'] - tableData['oligo'] / 2
+
+    if tableData['primer'] <= 0:
+        tableData['primer'] = tableData['oligo']
 
     # tableData['Na'] = 1.2
     return tableData

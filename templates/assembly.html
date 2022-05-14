@@ -42,77 +42,50 @@
             </div>
 
             <el-container>
-                <div id="show" class="main-height main-style"
-                     style="background-color: white;">
-
-                    <el-tabs type="border-card" style="border: 0"
-                             v-model="activeName"
-                             ref="tabs">
-
+                <div id="show" class="main-height main-style" style="background-color: white;">
+                    <el-tabs type="border-card" style="border: 0" v-model="activeName" ref="tabs">
                         <el-tab-pane label="input" name="input" v-loading="loading">
-
                             <el-form :model="dynamicValidateForm" ref="dynamicValidateForm" label-width="120px">
                                 <div style="text-align:right;">
-                                    <el-button
-                                            size="mini"
-                                            @click="testDemo()"
-                                            type="primary">
+                                    <el-button size="mini" @click="testDemo()" type="primary">
                                         demo
                                     </el-button>
                                 </div>
 
                                 <h3 style="margin-top: 0px;">Email Address</h3>
-                                <el-form-item
-                                        size="small"
-                                        prop="email"
-                                        label="email"
-                                        :rules="[{ required: true, message: 'Please enter email address', trigger: 'blur' },
-                                                 { type: 'email', message: 'Please enter the correct email address', trigger: 'blur,change' }]"
-                                >
-                                    <el-input
-                                            size="small"
-                                            clearable
-                                            v-model="dynamicValidateForm.email"
-                                            class="input_style"></el-input>
+                                <el-form-item size="small" prop="email" label="email"
+                                              :rules="[{ required: true, message: 'Please enter email address', trigger: 'blur' },
+                                                 { type: 'email', message: 'Please enter the correct email address', trigger: 'blur,change' }]">
+                                    <el-input size="small" clearable v-model="dynamicValidateForm.email"
+                                              class="input_style"></el-input>
                                     Required.
 
                                 </el-form-item>
 
                                 <h3>Gene Information</h3>
-                                <el-form-item
-                                        size="small"
-                                        label="name">
-                                    <el-input class="input_style"
-                                              size="small"
-                                              clearable
-                                              placement="top"
-                                              v-model="dynamicValidateForm.geneName"
-                                    ></el-input>
+                                <el-form-item size="small" label="name">
+                                    <el-input class="input_style" size="small" clearable placement="top"
+                                              v-model="dynamicValidateForm.geneName"></el-input>
                                     Optional.
                                 </el-form-item>
 
                                 <el-form-item label="description Optional">
-                                    <el-input
-                                            clearable
-                                            type="textarea" rows="4"
-                                            v-model="dynamicValidateForm.geneDesc"
-                                    >
-                                    </el-input>
+                                    <el-input clearable type="textarea" rows="4"
+                                              v-model="dynamicValidateForm.geneDesc"></el-input>
                                 </el-form-item>
 
 
                                 <el-form-item prop="gene" style="margin-bottom: 5px !important;" label="DNA seq"
                                               required>
-                                    <el-input type="textarea" rows="7"
-                                              @input="calGeneLength"
-                                              v-model="dynamicValidateForm.gene"
-                                    ></el-input>
+                                    <el-input type="textarea" rows="7" @input="calGeneLength"
+                                              v-model="dynamicValidateForm.gene"></el-input>
                                 </el-form-item>
 
                                 <el-form-item prop="geneLen" style="height: 30px; margin-top: -5px">
                                     <el-col :span="8" style="margin-left: 322px;">
                                         <span style="float: right; height: 30px; line-height: 30px">
-                                            length: {[ dynamicValidateForm.geneLen ]}</span>
+                                            length: {[ dynamicValidateForm.geneLen ]}
+                                        </span>
                                     </el-col>
                                 </el-form-item>
 
@@ -121,33 +94,21 @@
                                 </h3>
                                 <div id="table" style="margin-left: 120px;">
 
-                                    <el-table
-                                            :data="dynamicValidateForm.tableData"
-                                            border
-                                            stripe
-                                            size="small"
-                                            style="width: 60%"
-                                            :cell-style="{'padding':'0px'}"
-                                            :header-cell-style="{'padding':'8px'}"
-                                    >
-                                        <el-table-column
-                                                prop="ion"
-                                                label="ion"
-                                                style="height: 26px!important; ">
+                                    <el-table :data="dynamicValidateForm.tableData" border stripe size="small"
+                                              style="width: 60%"
+                                              :cell-style="{'padding':'0px'}"
+                                              :header-cell-style="{'padding':'8px'}">
+                                        <el-table-column prop="ion" label="ion" style="height: 26px!important; ">
                                             <template slot-scope="scope">
                                                 <p v-html="scope.row.ion"
                                                    style="margin: 0px; height: 26px!important;"></p>
                                             </template>
                                         </el-table-column>
 
-                                        <el-table-column
-                                                prop="concentration"
-                                                label="concentration">
+                                        <el-table-column prop="concentration" label="concentration">
                                             <template slot-scope="scope">
-                                                <el-form-item
-                                                        :prop="'tableData.' + scope.$index + '.name'"
-                                                        style="margin: 1px"
-                                                >
+                                                <el-form-item :prop="'tableData.' + scope.$index + '.name'"
+                                                              style="margin: 1px">
                                                     <el-input class="input_number"
                                                               size="small"
                                                               style="margin-left: -110px;"
@@ -156,13 +117,13 @@
                                                     </el-input>
                                                     {[ scope.row.unit ]} &nbsp;&nbsp;
 
-                                                    <el-popover v-if="scope.row.info != ''"
-                                                        placement="top-start"
-                                                        {#title="标题"#}
-                                                        width="300"
-                                                        trigger="hover">
-                                                         {[scope.row.info]}
+                                                    <el-popover v-if="scope.row.info != ''" placement="top-start"
+                                                                width="300" trigger="hover">
+
+                                                        <p>{[scope.row.info]}</p>
+
                                                         <i class="el-icon-info" slot="reference"></i>
+
                                                       </el-popover>
 
                                                 </el-form-item>
@@ -230,30 +191,21 @@
                                 </el-form-item>
 
                                 <div v-if="dynamicValidateForm.verification == 'Yes'">
-                                    <el-form-item
-                                            size="small"
-                                            style="margin-left: 0px; "
-                                            id="annealingTemp"
-                                    >
+                                    <el-form-item size="small" style="margin-left: 0px; " id="annealingTemp">
 
-                                        <el-form-item prop="temperature"
-                                                      label="annealing temperature:"
-                                                      class="el-form-item_line"
-                                                      required
-                                        >
-                                            <el-input class="input_number"
-                                                      size="small"
-                                                          type='number'
-                                                          v-model.number="dynamicValidateForm.temperature"></el-input>
-                                                &#8451;
-                                            </el-form-item>
+                                        <el-form-item prop="temperature" label="annealing temperature:"
+                                                      class="el-form-item_line" required>
+                                            <el-input class="input_number" size="small" type='number'
+                                                      v-model.number="dynamicValidateForm.temperature"></el-input>
+                                            &#8451;
+                                        </el-form-item>
                                         <br>
 
-                                            <el-form-item prop="oligoConc" label="oligo_conc:"
-                                                          class="el-form-item_line"
-                                                          required>
-                                                <el-input class="input_number"
-                                                          size="small"
+                                        <el-form-item prop="oligoConc" label="oligo_conc:"
+                                                      class="el-form-item_line"
+                                                      required>
+                                            <el-input class="input_number"
+                                                      size="small"
                                                           type='number'
                                                           v-model.number="dynamicValidateForm.oligoConc"></el-input>
                                                 nM
@@ -672,10 +624,14 @@
 
 
 
-<script src="https://cdn.bootcdn.net/ajax/libs/vue/2.5.16/vue.js"></script>
-<script src="https://cdn.bootcdn.net/ajax/libs/axios/0.18.0/axios.js"></script>
+{#<script src="https://cdn.bootcdn.net/ajax/libs/vue/2.5.16/vue.js"></script>#}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.js" integrity="sha512-Hy060ZqSc7vmSP4ZtCIG9zxhc9/hEjuWtnsv3C1sqPo+JLWa5JOsDe0aZkVyj7vkft9d1D07PDB3RrUOF3jzGQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+{#<script src="https://cdn.bootcdn.net/ajax/libs/axios/0.18.0/axios.js"></script>#}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js" integrity="sha512-rmzOdPpGoO4bACRffaiFrOe9YI2WFS87TZssHmbVPL9cHymNHrYM30oXoUKW7cL+xjwip8+WgCWRHr6ScvfUng==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+{#<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>#}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.0/jquery.min.js" integrity="sha512-0nVWK03Ud0k6o8wDkri8jxX9zQIn00ZHVud3iqBTwd2bGFwJDQShGVb3+vX1adCRxQckKQrIQMFmIA3tfWe+Mg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script src="https://unpkg.com/element-ui/lib/index.js"></script>
 

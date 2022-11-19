@@ -1,4 +1,6 @@
-
+import httplib2
+from urllib.parse import urlencode #python3
+import json
 
 def reverse_comple(seq):
     # 获取seq
@@ -33,6 +35,7 @@ def get_tableData(data_list):
     elif tableData['primer'] < 100 * tableData['oligo']:
         # TODO why 100?
         tableData['primer'] = tableData['primer'] - tableData['oligo'] / 2
+        pass
 
     if tableData['primer'] <= 0:
         tableData['primer'] = tableData['oligo']
@@ -79,4 +82,19 @@ def get_res_info(info):
         }
         tem_res.append(tem)
     return tem_res
+
+
+def get_ip(ip):
+    params = urlencode({'ip': ip, 'datatype': 'jsonp', 'callback': 'find'})
+    url = 'https://api.ip138.com/ip/?' + params
+    headers = {"token": "923c312227c9077250e89c578a7355e0"}  # token为示例
+
+    http = httplib2.Http()
+    response, content = http.request(url, 'GET', headers=headers)
+    data = content.decode("utf-8")[5:-1]
+    data = json.loads(data)
+    data['address'] = data['data'][0] + '-' + data['data'][1] + '-' + data['data'][2]
+    return data
+    # print(content.decode("utf-8"))
+    # find({"ret":"ok","ip":"113.78.68.22","data":["中国","广东","东莞","","电信","523000","0769"]})
 

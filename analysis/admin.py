@@ -7,7 +7,7 @@ admin.site.register(models.User)
 
 
 class GeneInfoAdmin(admin.ModelAdmin):
-    list_display = ('id', 'email', 'date', 'gene_len', 'min_len', 'max_len', 'pools', 'get_avg_pool', 'assembly_time')
+    list_display = ('id', 'email', 'ip', 'ip_addr', 'date', 'gene_len', 'min_len', 'max_len', 'pools', 'get_avg_pool', 'assembly_time')
 
     @admin.display(ordering='get_avg_pool')
     def get_avg_pool(self, obj):

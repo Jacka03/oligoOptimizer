@@ -92,6 +92,18 @@
                                 <h3>
                                     Parameters For Gene Synthesis
                                 </h3>
+
+                                <div style="margin-left: 100px">
+                                    <h4>Q5 High-Fidelity DNA Polymerase</h4>
+
+                                    <el-radio-group style="margin-left: 50px; margin-bottom: 30px"
+                                            v-model="dynamicValidateForm.Q5" @change="isQ5()" name="test">
+                                        <el-radio label="No">No</el-radio>
+                                        <el-radio label="Yes">Yes</el-radio>
+                                    </el-radio-group>
+
+                                </div>
+
                                 <div id="table" style="margin-left: 120px;">
 
                                     <el-table :data="dynamicValidateForm.tableData" border stripe size="small"
@@ -120,7 +132,8 @@
                                                     <el-popover v-if="scope.row.info != ''" placement="top-start"
                                                                 width="300" trigger="hover">
 
-                                                        <p>{[scope.row.info]}</p>
+                                                         <p>{[scope.row.info]}</p>
+
 
                                                         <i class="el-icon-info" slot="reference"></i>
 
@@ -307,27 +320,19 @@
                                                   border
                                                   v-if="showTable"
                                                   stripe
-                                                  :header-cell-style="{padding:3+'px', fontSize:'14px'}">
+                                                  :header-cell-style="{padding:3+'px', fontSize:'14px', align:'center'}">
 
-                                            <el-table-column :cell-style="{padding:3+'px'}"
-                                                    {#prop="key"#}
+                                            <el-table-column v-for="(item_j, j) in analy_dataColumn"
+                                                             :key="j"
+                                                             :label="item_j"
+                                                             :cell-style="{padding:3+'px'}"
                                                              align="center"
-                                                             label="Wrong pairing"
                                                              show-overflow-tooltip>
                                                 <template slot-scope="scope">
-                                                    {[ scope.row.key ]}
+                                                    <span v-html="scope.row[j]"></span>
                                                 </template>
                                             </el-table-column>
 
-                                            <el-table-column :cell-style="{padding:3+'px'}"
-                                                    {#prop="value"#}
-                                                             align="center"
-                                                             label="concentration(mol)"
-                                                             show-overflow-tooltip>
-                                                <template slot-scope="scope">
-                                                    {[ scope.row.value ]}
-                                                </template>
-                                            </el-table-column>
                                         </el-table>
                                     </div>
                                     <div v-else>
@@ -491,27 +496,19 @@
                                                   border
                                                   v-if="showTable"
                                                   stripe
-                                                  :header-cell-style="{padding:3+'px', fontSize:'14px'}">
+                                                  :header-cell-style="{padding:3+'px', fontSize:'14px', align:'center'}">
 
-                                            <el-table-column :cell-style="{padding:3+'px'}"
-                                                    {#prop="key"#}
+                                            <el-table-column v-for="(item_j, j) in analy_dataColumn"
+                                                             :key="j"
+                                                             :label="item_j"
+                                                             :cell-style="{padding:3+'px'}"
                                                              align="center"
-                                                             label="Wrong pairing"
                                                              show-overflow-tooltip>
                                                 <template slot-scope="scope">
-                                                    {[ scope.row.key ]}
+                                                    <span v-html="scope.row[j]"></span>
                                                 </template>
                                             </el-table-column>
 
-                                            <el-table-column :cell-style="{padding:3+'px'}"
-                                                    {#prop="value"#}
-                                                             align="center"
-                                                             label="concentration(mol)"
-                                                             show-overflow-tooltip>
-                                                <template slot-scope="scope">
-                                                    {[ scope.row.value ]}
-                                                </template>
-                                            </el-table-column>
                                         </el-table>
                                     </div>
                                     <div v-else>
@@ -624,15 +621,15 @@
 
 
 
-{#<script src="https://cdn.bootcdn.net/ajax/libs/vue/2.5.16/vue.js"></script>#}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.js" integrity="sha512-Hy060ZqSc7vmSP4ZtCIG9zxhc9/hEjuWtnsv3C1sqPo+JLWa5JOsDe0aZkVyj7vkft9d1D07PDB3RrUOF3jzGQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-{#<script src="https://cdn.bootcdn.net/ajax/libs/axios/0.18.0/axios.js"></script>#}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js" integrity="sha512-rmzOdPpGoO4bACRffaiFrOe9YI2WFS87TZssHmbVPL9cHymNHrYM30oXoUKW7cL+xjwip8+WgCWRHr6ScvfUng==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-{#<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>#}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.0/jquery.min.js" integrity="sha512-0nVWK03Ud0k6o8wDkri8jxX9zQIn00ZHVud3iqBTwd2bGFwJDQShGVb3+vX1adCRxQckKQrIQMFmIA3tfWe+Mg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
+<script src="https://cdn.bootcdn.net/ajax/libs/vue/2.5.16/vue.js"></script>
+{#<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.js" integrity="sha512-Hy060ZqSc7vmSP4ZtCIG9zxhc9/hEjuWtnsv3C1sqPo+JLWa5JOsDe0aZkVyj7vkft9d1D07PDB3RrUOF3jzGQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>#}
+{##}
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/0.18.0/axios.js"></script>
+{#<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js" integrity="sha512-rmzOdPpGoO4bACRffaiFrOe9YI2WFS87TZssHmbVPL9cHymNHrYM30oXoUKW7cL+xjwip8+WgCWRHr6ScvfUng==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>#}
+{##}
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+{#<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.0/jquery.min.js" integrity="sha512-0nVWK03Ud0k6o8wDkri8jxX9zQIn00ZHVud3iqBTwd2bGFwJDQShGVb3+vX1adCRxQckKQrIQMFmIA3tfWe+Mg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>#}
+{##}
 <script src="https://unpkg.com/element-ui/lib/index.js"></script>
 
 <script src="../static/js/assembly.js"></script>

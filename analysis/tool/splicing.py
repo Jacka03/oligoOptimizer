@@ -43,6 +43,8 @@ class Splicing:
         self.primer_min_len = 18
         self.primer_max_len = 24 + 1
 
+        self.Q5 = input_info['Q5']
+
     def cal_tm(self, temp_gene):
         """
         计算一小段基因(temp_gene)的tm
@@ -96,6 +98,18 @@ class Splicing:
         # TODO Mon离子浓度初始化
         c_Mon = c_K + c_Tris  # + c_Na
         c_Mg = c_Mg - c_dNTPs
+        if self.Q5 == 'Yes':
+            H = AATT * (-7.9 - 8.4) + ATTA * (-7.2 - 6.5) + TAAT * (-7.2 - 6.3) + CAGT * (-8.5 - 7.4) + GTCA * (
+                        -8.4 - 8.6) + CTGA * (-7.8 - 6.1) + GACT * (
+                        -8.2 - 7.7) + CGGC * (-10.6 - 10.1) + GCCG * (-9.8 - 11.1) + GGCC * (-8.0 - 6.7) + 0.1 + 2.3
+            S = AATT * (-22.2 - 23.6) + ATTA * (-20.4 - 18.8) + TAAT * (-21.3 - 18.5) + CAGT * (-22.7 - 19.3) + GTCA * (
+                        -22.4 - 23.0) + CTGA * (
+                        -21.0 - 16.1) + GACT * (
+                        -22.2 - 20.3) + CGGC * (-27.2 - 25.5) + GCCG * (-24.4 - 28.4) + GGCC * (
+                            -19.9 - 15.6) - 2.8 + 4.1 - 1.4 - 5.9 - 9.0 - 1.4
+            c_Na = 1  # mmol /
+            # print(self.Q5, "tes", c_Mg, )
+            pass
 
         kelvins = 273.15
 
@@ -528,7 +542,8 @@ class Splicing:
             oligo = self.gene[int(index_list[i][1]): int(index_list[i + 1][2])]
             index = int(i / 2)
             oligo_list.append(['F{0}'.format(index), oligo])
-            overlap = self.gene[int(index_list[i][1]): int(index_list[i][2])]
+            # TODO i should +1
+            overlap = self.gene[int(index_list[i+1][1]): int(index_list[i+1][2])]
             above_oligo_info.append(
                 ['F{0}'.format(index), oligo, round(self.cal_tm(overlap), 2), len(overlap), len(oligo)])
 
@@ -542,7 +557,8 @@ class Splicing:
             oligo = gene_complement[int(index_list[i][1]): int(index_list[i + 1][2])][::-1]  # 转化成从左到右是5'到3'
             index = int((i - 1) / 2)
             oligo_list.append(['R{0}'.format(index), oligo])
-            overlap = gene_complement[int(index_list[i][1]): int(index_list[i][2])][::-1]
+            # TODO i should +1
+            overlap = gene_complement[int(index_list[i+1][1]): int(index_list[i+1][2])][::-1]
             below_oligo_info.append(
                 ['R{0}'.format(index), oligo, round(self.cal_tm(overlap), 2), len(overlap), len(oligo)])
         # 最后一片
@@ -606,6 +622,7 @@ class Splicing:
         index, tm = self.cal_next_tm()
         # show_w(index, tm, "1")
         # index, tm = self.cal_next_tm(np.mean(tm))
+        # print(self.Q5)
 
         index = np.insert(index, 0, [0])
         index, tm = self.iteration(index, tm)

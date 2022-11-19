@@ -4,14 +4,14 @@ import re
 import time
 
 import pandas as pd
+
 from django.http import JsonResponse, Http404, HttpResponse
 from django.shortcuts import render
-# Create your views here.
 from django.views import View
 
 from analysis import models
 from analysis.tool.splicing import Splicing
-from analysis.tool.utils import preprocessing_data, get_res_info
+from analysis.tool.utils import preprocessing_data, get_res_info, get_ip
 from analysis.tool.verification import Verification
 
 
@@ -22,8 +22,10 @@ class AssemblyView(View):
 
     def post(self, request):
         try:
+            user_ip = request.META.get('REMOTE_ADDR')
             data = json.loads(request.body)
             data = preprocessing_data(data)
+            ip_data = get_ip(user_ip)
 
             splic = Splicing(data)
             start = time.time()
@@ -31,7 +33,14 @@ class AssemblyView(View):
             end = time.time()
             # add to db
             models.GeneInfo.objects.create(email=data['email'], gene_len=data['geneLen'], pools=data['pools'],
-                                           min_len=data['minLen'], max_len=data['maxLen'], assembly_time=end-start)
+                                           ip=ip_data['ip'], ip_addr=ip_data['address'],
+                                           min_len=data['minLen'], max_len=data['maxLen'], assembly_time=end - start)
+
+            models.Data.objects.create(email=data['email'], gene=data['gene'],
+                                       min_len=data['minLen'], max_len=data['maxLen'], pools=data['pools'],
+                                       k=data['K'], mg=data['Mg'], dntps=data['dNTPs'], tris=data['Tris'],
+                                       primer=data['primer'], oligo=data['oligo'],
+                                       gap=data['resultType'], verification=data['verification'])
 
             # add cal info to context
             tem_res = get_res_info(info)
@@ -51,22 +60,19 @@ class AssemblyView(View):
                 if primer_conc == 0 or primer_conc == 0.:
                     print(primer_conc)
                     primer_conc = oligo_conc
-                    
+
                 # 分析过程
                 analy = Verification(next_cal, data['temperature'], oligo_conc, primer_conc)
 
                 analy_info = analy.get_strand_tube_all()
 
-                # models.VerificationInfo.objects.create(cube_count=8000, gene_segment_count=next_cal[2],
-                #                                        verification_two_time=mid-start, verification_three_time=end-mid)
-                # print("two:{0}, three:{1}".format(mid-start, end-mid))
-
                 analy_info_list = []
                 for key, value in analy_info.items():
-                    analy_info_list.append({
-                        'key': key,
-                        'value': value,
-                    })
+                    # analy_info_list.append({
+                    #     'key': key,
+                    #     'value': value,
+                    # })
+                    analy_info_list.append([key, value[0], value[1]])
                 context['analyInfo'] = analy_info_list
 
             arr = [context]
@@ -82,6 +88,9 @@ class AssemblyPoolsView(View):
 
     def post(self, request):
         try:
+            user_ip = request.META.get('REMOTE_ADDR')
+            ip_data = get_ip(user_ip)
+
             data = json.loads(request.body)
             data = preprocessing_data(data)
 
@@ -93,7 +102,7 @@ class AssemblyPoolsView(View):
 
             # overlap of each pool
             each_pool = round((len(index) - 1) / pools)
-            each_pool = [each_pool + 1, each_pool + 1] if each_pool % 2 == 0 else [each_pool, each_pool+2]
+            each_pool = [each_pool + 1, each_pool + 1] if each_pool % 2 == 0 else [each_pool, each_pool + 2]
 
             # each_pool = each_pool + 1 if each_pool % 2 == 0 else each_pool
             # print("after pools:{0}".format(each_pool))
@@ -144,7 +153,14 @@ class AssemblyPoolsView(View):
                 arr.append(context)
             end = time.time()
             models.GeneInfo.objects.create(email=data['email'], gene_len=data['geneLen'], pools=data['pools'],
-                                           min_len=data['minLen'], max_len=data['maxLen'], assembly_time=end-start)
+                                           ip=ip_data['ip'], ip_addr=ip_data['address'],
+                                           min_len=data['minLen'], max_len=data['maxLen'], assembly_time=end - start)
+
+            models.Data.objects.create(email=data['email'], gene=data['gene'],
+                                       min_len=data['minLen'], max_len=data['maxLen'], pools=data['pools'],
+                                       k=data['K'], mg=data['Mg'], dntps=data['dNTPs'], tris=data['Tris'],
+                                       primer=data['primer'], oligo=data['oligo'],
+                                       gap=data['resultType'], verification=data['verification'])
 
             context = {'arr': arr}
         except Exception as err:
@@ -174,17 +190,17 @@ class AnalysisView(View):
             analy = Verification(next_cal[0], next_cal[1], oligo_conc, primer_conc)
             analy_info = analy.get_strand_tube_all()
 
-            # models.VerificationInfo.objects.create(cube_count=8000, gene_segment_count=next_cal[2],
-            #                                        verification_two_time=mid-start, verification_three_time=end-mid)
-
             analy_info_list = []
             context = {}
             for key, value in analy_info.items():
-                analy_info_list.append({
-                    'key': key,
-                    'value': value,
-                })
+                # analy_info_list.append({
+                #     'key': key,
+                #     'value': value,
+                # })
+                analy_info_list.append([key, value[0], value[1]])
+
             context['analyInfo'] = analy_info_list
+
         except Exception as err:
             print(err)
             raise Http404(err)

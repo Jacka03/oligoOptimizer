@@ -26,6 +26,7 @@ new Vue({
                 primerConc: 100,
 
                 // concentrations: 1,
+                Q5: 'No',
 
                 resultType: 'Gap',
                 verification: 'No',
@@ -46,7 +47,7 @@ new Vue({
                     }, {
                         name: 'dNTPs',
                         data: 4,
-                        ion: 'dNTPs (1-1000mM)',
+                        ion: 'dNTPs (0.1-1000mM)',
                         unit: 'mM',
                         info: '',
                     }, {
@@ -87,6 +88,8 @@ new Vue({
                     name: 'length', width: 75,
                 },
             ],
+
+            analy_dataColumn: [ 'Wrong pairing', 'concentration(mol)', 'free energy(kcal/mol)'  ],
 
             arr: [],
             anotherArr: [],
@@ -217,6 +220,22 @@ new Vue({
             this.$refs[formName].resetFields();
         },
 
+        isQ5() {
+          // console.log(this.dynamicValidateForm.Q5)
+            // deflaut：primer 500nM, dNTP 0.2mM, Mg2+ 2.2mM
+            if(this.dynamicValidateForm.Q5 == 'Yes') {
+                this.dynamicValidateForm.tableData[1].data = 2.2
+                this.dynamicValidateForm.tableData[2].data = 0.2
+                this.dynamicValidateForm.tableData[5].data = 500
+            }
+
+            if(this.dynamicValidateForm.Q5 == 'No') {
+                this.dynamicValidateForm.tableData[1].data = 8
+                this.dynamicValidateForm.tableData[2].data = 4
+                this.dynamicValidateForm.tableData[5].data = 400
+            }
+        },
+
         testData(formData) {
             // email
             if (formData.email == null) {
@@ -247,15 +266,45 @@ new Vue({
             }
 
             // Parameters
-            for (let i = 0; i < 4; i++) {
-                if (formData.tableData[i].data < 1 || formData.tableData[i].data > 1000) {
-                    this.$message({
-                        message: formData.tableData[i].name + ' ion concentration',
-                        type: "error"
-                    });
-                    return false;
-                }
+            // for (let i = 0; i < 4; i++) {
+            //     if (formData.tableData[i].data < 1 || formData.tableData[i].data > 1000) {
+            //         this.$message({
+            //             message: formData.tableData[i].name + ' ion concentration',
+            //             type: "error"
+            //         });
+            //         return false;
+            //     }
+            // }
+            if (formData.tableData[0].data < 1 || formData.tableData[0].data > 1000) {
+                this.$message({
+                    message: formData.tableData[0].name + ' ion concentration',
+                    type: "error"
+                });
+                return false;
             }
+
+            if (formData.tableData[1].data < 1 || formData.tableData[1].data > 1000) {
+                this.$message({
+                    message: formData.tableData[1].name + ' ion concentration',
+                    type: "error"
+                });
+                return false;
+            }
+            if (formData.tableData[2].data < 0.1 || formData.tableData[2].data > 1000) {
+                this.$message({
+                    message: formData.tableData[2].name + ' ion concentration',
+                    type: "error"
+                });
+                return false;
+            }
+            if (formData.tableData[3].data < 1 || formData.tableData[3].data > 1000) {
+                this.$message({
+                    message: formData.tableData[3].name + ' ion concentration',
+                    type: "error"
+                });
+                return false;
+            }
+
             if (formData.tableData[4].data < 0.1 || formData.tableData[4].data > 1000) {
                 this.$message({
                     message: formData.tableData[4].name + ' ion concentration',
@@ -348,8 +397,10 @@ new Vue({
             that.loading = true;
             axios.post("/analysis/", info).then(function (response) {
                 if(res == 'res1') {
+                    // console.log(response.data.analyInfo)
                     that.arr[index]["analyInfo"] = response.data.analyInfo;
                 } else if(res == 'res2') {
+
                     that.anotherArr[index]["analyInfo"] = response.data.analyInfo;
                 }
 

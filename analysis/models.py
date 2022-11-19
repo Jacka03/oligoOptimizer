@@ -26,6 +26,10 @@ class User(models.Model):
 
 class GeneInfo(models.Model):
     email = models.EmailField(verbose_name='email')
+
+    ip = models.CharField(verbose_name='ip', default='/', max_length=30)
+    ip_addr = models.CharField(verbose_name='address', default='/', max_length=30)
+
     date = models.DateTimeField(auto_now_add=True, verbose_name='date')
 
     gene_len = models.IntegerField(verbose_name='gene_len')
@@ -34,6 +38,28 @@ class GeneInfo(models.Model):
     max_len = models.SmallIntegerField(verbose_name='max_len')
 
     assembly_time = models.FloatField(verbose_name='assembly_time')
+
+
+class Data(models.Model):
+    email = models.EmailField(verbose_name='email')
+    date = models.DateTimeField(auto_now_add=True, verbose_name='date')
+
+    gene = models.TextField(verbose_name='gene')
+
+    k = models.IntegerField(verbose_name='k')
+    mg = models.IntegerField(verbose_name='mg')
+    dntps = models.IntegerField(verbose_name='dntps')
+    tris = models.IntegerField(verbose_name='tris')
+    oligo = models.IntegerField(verbose_name='oligo')
+    primer = models.IntegerField(verbose_name='primer')
+
+    min_len = models.SmallIntegerField(verbose_name='min_len')
+    max_len = models.SmallIntegerField(verbose_name='max_len')
+
+    gap = models.CharField(verbose_name='gap', max_length=20)
+
+    pools = models.SmallIntegerField(verbose_name='pools')
+    verification = models.CharField(verbose_name='verification', max_length=10)
 
 
 class VerificationInfo(models.Model):

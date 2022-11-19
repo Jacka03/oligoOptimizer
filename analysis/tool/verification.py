@@ -29,14 +29,21 @@ class Verification:
 
         my_model = Model(material='dna', celsius=self.temp)
         t = Tube(strands=strands, complexes=SetSpec(max_size=2), name='t')  # complexes defaults to [A, B]
-        tube_results = tube_analysis(tubes=[t], model=my_model)
+        tube_results = tube_analysis(tubes=[t], model=my_model)  # , compute=['mfe', 'subopt', 'ensemble_size', 'sample', 'pairs']
 
+        free_energy = {}
         all_conc = {}
         for my_complex, conc in tube_results.tubes[t].complex_concentrations.items():
             all_conc[my_complex.name] = conc  # 反应后每个试管中DNA的浓度
+            free_energy[my_complex.name] = 1  # 反应后每个试管中DNA的浓度
+
+        for key1, key2 in zip(free_energy.keys(), tube_results.complexes.keys()):
+            free_energy[key1] = tube_results.complexes[key2].free_energy
+            # print(key1, dict_map[key1], key2, dict_map1[key2])
+
         all_conc = sorted(all_conc.items(), key=lambda d: d[1], reverse=True)  # 排序
 
-        print(all_conc)
+        # print(all_conc)
         # F last one
         above_oligo_count = int(len(self.oligo)/2) - 2
         tem_char = 'F{0}'.format(above_oligo_count)
@@ -77,6 +84,15 @@ class Verification:
             # 判断条件有待改进
             elif val < self.oligo_check_conc:  #
                 break
+        # print(error)
+        # tem_err = {}
+        for k, v in error.items():
+            tem_k = k.replace(',', '+').replace(' ', '')
+            tem_k = '(' + tem_k + ')'
+            # print(tem_k)
+            error[k] = [v, free_energy[tem_k]]
+            pass
+
         # print(error)
         return error
 

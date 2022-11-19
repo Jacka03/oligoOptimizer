@@ -33,3 +33,7 @@
 #annealingTemp  .el-form-item__label {
     width: 190px ! important;
 }
+
+.el-popper {
+    word-break: break-word;
+}
